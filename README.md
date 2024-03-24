@@ -1,0 +1,1 @@
+A project that uses the SpotifyAPI to fetch a user's followed artists, and from there, fetch the releases from each of the artists and filter for releases that came out in the last 7 days. 
