@@ -20,6 +20,8 @@ app.use('/api', router);
 app.use('/auth', auth)
 app.use(express.static('public'));
 
+//build in logic for showing user front-end based on cookie
+
 // app.use((req, res, next) => {
 //     // Access the refresh token from the cookie
 //     const refreshToken = req.cookies.refresh_token;
@@ -38,8 +40,6 @@ async function run() {
 
     await authFunctions.refreshAccessTokens(users);
 
-    // const user = users[0];
-
     for (const user of users) {
         const followedArtists = await functions.getFollowedArtists(user);
         let releases = await functions.getReleasesByArtist(user, followedArtists);
@@ -56,26 +56,17 @@ async function run() {
     }
 }
 
-run().catch(console.error);
+// run().catch(console.error);
 
-//schedule the run() function to occur every Friday at 9am, Central Standard Time
-// const scheduledRun = cron.schedule('* 9 * * Fri', () => {
-//     console.log("Starting the 9am request for new releases...\n")
-//     run();
-// }, {
-//     scheduled: false,
-//     timezone: "US/Central"
-// });
+// schedule the run() function to occur every Friday at 9am, Central Standard Time
+const scheduledRun = cron.schedule('* 9 * * Fri', () => {
+    console.log("Starting the 9am request for new releases...\n")
+    run();
+}, {
+    scheduled: false,
+    timezone: "US/Central"
+});
 
-// scheduledRun.start();
-
-// const scheduledRun = cron.schedule('* * * * *', () => {
-//     console.log("Task initiated.")
-//     run();
-// }, {
-//     scheduled: false,
-// });
-
-// scheduledRun.start();
+scheduledRun.start();
 
 
