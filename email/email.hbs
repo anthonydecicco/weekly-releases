@@ -25,7 +25,7 @@
             margin: 0 3px 50px 3px;
             vertical-align: top;
             width: 310px;
-            height: 350px;
+            height: 365px;
         }
 
         .album-art img {
@@ -36,6 +36,7 @@
 
         .album-name,
         .artists,
+        .tracks,
         .release-date {
             margin: 0;
             padding: 0;
@@ -74,6 +75,11 @@
                 </a>
                 <h3 class="album-name">{{this.name}}</h3>
                 <p class="artists">{{this.artists}}</p>
+                {{#if (compare this.total_tracks '>' 1)}}
+                <p class="tracks">{{this.total_tracks}} tracks</p>
+                {{else}}
+                <p class="tracks">{{this.total_tracks}} track</p>
+                {{/if}}
                 <p class="release-date">{{this.release_date}}</p>
             </li>
             {{/each}}
