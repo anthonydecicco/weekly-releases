@@ -12,6 +12,19 @@ const client = new MongoClient(mongoDbString, {
 const db = client.db("New-Music-Notifications");
 const collection = db.collection("UserInfo");
 
+async function getUsers() {
+    try {
+        await client.connect();
+        const cursor = collection.find();
+        const users = await cursor.toArray();
+        return users;
+    } catch (error) {
+        console.error("Error fetching users: " + error);
+    } finally {
+        await client.close();
+    }
+}
+
 async function addOrUpdateUserInfo(userInfo) {
     const filterUserInfo = { "userId": userInfo.userId };
     const updateUserInfo = {
@@ -27,9 +40,6 @@ async function addOrUpdateUserInfo(userInfo) {
         await client.connect();
 
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
-        // console.log(
-        //     `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
-        // );
 
     } catch (error) {
         console.log("error:" + error);
@@ -42,3 +52,4 @@ async function addOrUpdateUserInfo(userInfo) {
 exports.client = client;
 exports.collection = collection;
 exports.addOrUpdateUserInfo = addOrUpdateUserInfo;
+exports.getUsers = getUsers;

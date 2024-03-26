@@ -17,7 +17,7 @@ function generateRandomString(length) {
     .slice(0, length);
 }
 
-auth.get('/login', function (req, res) {
+auth.get('/login', async function (req, res) {
     const state = generateRandomString(16);
     const scope = 'user-read-private user-read-email user-follow-read user-follow-modify';
 
@@ -31,7 +31,7 @@ auth.get('/login', function (req, res) {
     }));
 })
 
-auth.get('/callback', function (req, res) {
+auth.get('/callback', async function (req, res) {
     const code = req.query.code || null;
     const state = req.query.state || null;
 
@@ -55,12 +55,12 @@ auth.get('/callback', function (req, res) {
             json: true
         };
 
-        request.post(authOptions, function (error, response, body) {
+        request.post(authOptions, async function (error, response, body) {
             if (!error && response.statusCode === 200) {
                 const access_token = body.access_token;
                 const refresh_token = body.refresh_token;
 
-                res.cookie('refresh_token', refresh_token);
+                res.cookie('refresh_token', refresh_token, { maxAge: 900000, httpOnly: true });
 
                 const userOptions = {
                     url: 'https://api.spotify.com/v1/me',
@@ -68,7 +68,7 @@ auth.get('/callback', function (req, res) {
                     json: true
                 }
 
-                request.get(userOptions, function (error, response, body) {
+                request.get(userOptions, async function (error, response, body) {
                     const user = body;
 
                     const userInfo = {
@@ -79,10 +79,12 @@ auth.get('/callback', function (req, res) {
                     }
 
                     console.log("User info:\n" + userInfo.userEmail + "\n" + userInfo.userId + "\n" + userInfo.userTempAccessToken + "\n" + userInfo.userRefreshToken);
-                    db.addOrUpdateUserInfo(userInfo);
+                    await db.addOrUpdateUserInfo(userInfo);
                 })
 
                 res.redirect('/');
+                //do I need this if I'm redirecting in app.js?
+                //what if I use render instead?
 
             } else {
                 res.redirect('/#' +
@@ -95,7 +97,7 @@ auth.get('/callback', function (req, res) {
     }
 })
 
-auth.post('/refresh_token', async (req, res) => {
+auth.post('/refresh_token', async function (req, res) {
     try {
         const refresh_token = req.body.refresh_token; 
 
