@@ -21,9 +21,6 @@ app.use('/', router);
 app.use('/auth', auth);
 app.use(express.static('public'))
 
-//add in routes for serving static files
-// app.use(express.static('public'));
-
 app.get('/home', async (req, res) => {
     const refreshTokenCookie = req.cookies.refresh_token;
 
