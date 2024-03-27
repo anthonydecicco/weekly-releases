@@ -19,9 +19,15 @@ app.use(cookieParser());
 
 app.use('/', router);
 app.use('/auth', auth);
-app.use(express.static('public'))
+app.use(express.static('public', { 
+    setHeaders: (res, filePath) => {
+        if (path.extname(filePath) === '.js') {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+    }
+}));
 
-app.get('/home', async (req, res) => {
+app.get('/', async (req, res) => {
     const refreshTokenCookie = req.cookies.refresh_token;
 
     if (refreshTokenCookie) {
@@ -30,14 +36,18 @@ app.get('/home', async (req, res) => {
         if (refreshToken) {
             console.log("Refresh token validated, proceed to Home")
             res.sendFile(path.join(__dirname, 'public', 'home.html'));
+            //Potential for using template engine here to inject html with data based on
+            //refresh token
         } else {
             console.log("Invalid token, authentication needed");
-            res.redirect('/auth/login');
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+            //Template engine here as well? It may help with scaling site and adding links 
+            //and content that can be conditional based on presence of a valid token 
         }
 
     } else {
         console.log("Invalid token, authentication needed")
-        res.redirect('/auth/login');
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     }
 }) 
 
