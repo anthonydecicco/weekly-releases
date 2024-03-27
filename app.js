@@ -8,6 +8,7 @@ const authFunctions = require('./auth/auth.helper.functions');
 const cookieParser = require('cookie-parser');
 const email = require('./email/email');
 const db = require('./utils/db');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -16,9 +17,32 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use('/auth', auth)
+app.use('/', router);
+app.use('/auth', auth);
+app.use(express.static('public'))
+
 //add in routes for serving static files
-app.use(express.static('public'));
+// app.use(express.static('public'));
+
+app.get('/home', async (req, res) => {
+    const refreshTokenCookie = req.cookies.refresh_token;
+
+    if (refreshTokenCookie) {
+        const refreshToken = await db.checkForRefreshToken(refreshTokenCookie);
+
+        if (refreshToken) {
+            console.log("Refresh token validated, proceed to Home")
+            res.sendFile(path.join(__dirname, 'public', 'home.html'));
+        } else {
+            console.log("Invalid token, authentication needed");
+            res.redirect('/auth/login');
+        }
+
+    } else {
+        console.log("Invalid token, authentication needed")
+        res.redirect('/auth/login');
+    }
+}) 
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
@@ -46,7 +70,7 @@ async function run() {
     }
 }
 
-run().catch(console.error);
+// run().catch(console.error);
 
 // schedule the run() function to occur every Friday at 9am, Central Standard Time
 const scheduledRun = cron.schedule('* 9 * * Fri', () => {

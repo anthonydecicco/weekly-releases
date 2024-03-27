@@ -49,7 +49,26 @@ async function addOrUpdateUserInfo(userInfo) {
     }
 }
 
+//add in null check
+async function checkForRefreshToken(refreshTokenCookie) {
+    const filterRefreshToken = { "userRefreshToken": refreshTokenCookie }
+
+    try {
+        await client.connect();
+        console.log("Filter: " + filterRefreshToken.userRefreshToken);
+        const result = await collection.findOne(filterRefreshToken);
+        console.log("Result: " + result.userRefreshToken);
+        const userRefreshToken = result.userRefreshToken;
+        return userRefreshToken;
+    } catch (error) {
+        console.log("Error: " + error)
+    } finally {
+        await client.close();
+    }
+}
+
 exports.client = client;
 exports.collection = collection;
 exports.addOrUpdateUserInfo = addOrUpdateUserInfo;
 exports.getUsers = getUsers;
+exports.checkForRefreshToken = checkForRefreshToken;
