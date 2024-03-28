@@ -41,6 +41,14 @@ async function addOrUpdateUserInfo(userInfo) {
 
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
 
+        if (result.matchedCount > 0 && result.modifiedCount > 0) {
+            console.log(`Document found using filter, ${result.modifiedCount} updates were made.`);
+        } else if (result.matchedCount > 0 && result.modifiedCount === 0 || null) {
+            console.log("Document found using filter, no updates were made.");
+        } else {
+            console.log("No documents found using filter.")
+        }
+
     } catch (error) {
         console.log("error:" + error);
     }
@@ -49,21 +57,27 @@ async function addOrUpdateUserInfo(userInfo) {
     }
 }
 
-//add in null check
 async function checkForRefreshToken(refreshTokenCookie) {
-    const filterRefreshToken = { "userRefreshToken": refreshTokenCookie }
+    if (refreshTokenCookie) {
+        const filterRefreshToken = { "userRefreshToken": refreshTokenCookie }
+    
+        try {
+            await client.connect();
+            const result = await collection.findOne(filterRefreshToken);
 
-    try {
-        await client.connect();
-        console.log("Filter: " + filterRefreshToken.userRefreshToken);
-        const result = await collection.findOne(filterRefreshToken);
-        console.log("Result: " + result.userRefreshToken);
-        const userRefreshToken = result.userRefreshToken;
-        return userRefreshToken;
-    } catch (error) {
-        console.log("Error: " + error)
-    } finally {
-        await client.close();
+            if (result) {
+                const userRefreshToken = result.userRefreshToken;
+                return userRefreshToken;
+            } else {
+                console.log("No document found using the submitted refresh token.")
+            }
+        } catch (error) {
+            console.log("Error: " + error)
+        } finally {
+            await client.close();
+        }
+    } else {
+        console.log("refreshTokenCookie = null");
     }
 }
 

@@ -13,19 +13,17 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 8080;
 
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+})
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/', router);
 app.use('/auth', auth);
-app.use(express.static('public', { 
-    setHeaders: (res, filePath) => {
-        if (path.extname(filePath) === '.js') {
-            res.setHeader('Content-Type', 'application/javascript');
-        }
-    }
-}));
+app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
     const refreshTokenCookie = req.cookies.refresh_token;
@@ -34,7 +32,7 @@ app.get('/', async (req, res) => {
         const refreshToken = await db.checkForRefreshToken(refreshTokenCookie);
 
         if (refreshToken) {
-            console.log("Refresh token validated, proceed to Home")
+            console.log("Refresh token validated, proceed to Home");
             res.sendFile(path.join(__dirname, 'public', 'home.html'));
             //Potential for using template engine here to inject html with data based on
             //refresh token
@@ -46,14 +44,10 @@ app.get('/', async (req, res) => {
         }
 
     } else {
-        console.log("Invalid token, authentication needed")
+        console.log("Invalid token, authentication needed");
         res.sendFile(path.join(__dirname, 'public', 'index.html'));
     }
 }) 
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-})
 
 async function run() {
 
