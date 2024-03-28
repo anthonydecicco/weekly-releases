@@ -1,6 +1,9 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 
-//add in routes for serving static files
+router.get('/home', async function (req, res) {
+    res.sendFile(path.join(__dirname, '../public', 'home.html'));
+});
 
 module.exports = router;

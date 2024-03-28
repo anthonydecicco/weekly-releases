@@ -41,6 +41,14 @@ async function addOrUpdateUserInfo(userInfo) {
 
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
 
+        if (result.matchedCount > 0 && result.modifiedCount > 0) {
+            console.log(`Document found using filter, ${result.modifiedCount} updates were made.`);
+        } else if (result.matchedCount > 0 && result.modifiedCount === 0 || null) {
+            console.log("Document found using filter, no updates were made.");
+        } else {
+            console.log("No documents found using filter.")
+        }
+
     } catch (error) {
         console.log("error:" + error);
     }
@@ -49,7 +57,33 @@ async function addOrUpdateUserInfo(userInfo) {
     }
 }
 
+async function checkForRefreshToken(refreshTokenCookie) {
+    if (refreshTokenCookie) {
+        const filterRefreshToken = { "userRefreshToken": refreshTokenCookie }
+    
+        try {
+            await client.connect();
+            const result = await collection.findOne(filterRefreshToken);
+
+            if (result) {
+                const userRefreshToken = result.userRefreshToken;
+                return userRefreshToken;
+            } else {
+                console.log("No document found using the submitted refresh token.")
+            }
+        } catch (error) {
+            console.log("Error: " + error)
+        } finally {
+            await client.close();
+        }
+    } else {
+        console.log("refreshTokenCookie = null");
+    }
+}
+
 exports.client = client;
 exports.collection = collection;
 exports.addOrUpdateUserInfo = addOrUpdateUserInfo;
 exports.getUsers = getUsers;
+exports.checkForRefreshToken = checkForRefreshToken;
+

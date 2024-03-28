@@ -80,12 +80,9 @@ auth.get('/callback', async function (req, res) {
 
                     console.log("User info:\n" + userInfo.userEmail + "\n" + userInfo.userId + "\n" + userInfo.userTempAccessToken + "\n" + userInfo.userRefreshToken);
                     await db.addOrUpdateUserInfo(userInfo);
+                    res.redirect('/home');
                 })
-
-                res.redirect('/');
-                //do I need this if I'm redirecting in app.js?
-                //what if I use render instead?
-
+              
             } else {
                 res.redirect('/#' +
                     queryString.stringify({

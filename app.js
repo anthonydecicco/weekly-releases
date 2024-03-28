@@ -8,21 +8,46 @@ const authFunctions = require('./auth/auth.helper.functions');
 const cookieParser = require('cookie-parser');
 const email = require('./email/email');
 const db = require('./utils/db');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+})
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use('/auth', auth)
-//add in routes for serving static files
+app.use('/', router);
+app.use('/auth', auth);
 app.use(express.static('public'));
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-})
+app.get('/', async (req, res) => {
+    const refreshTokenCookie = req.cookies.refresh_token;
+
+    if (refreshTokenCookie) {
+        const refreshToken = await db.checkForRefreshToken(refreshTokenCookie);
+
+        if (refreshToken) {
+            console.log("Refresh token validated, proceed to Home");
+            res.sendFile(path.join(__dirname, 'public', 'home.html'));
+            //Potential for using template engine here to inject html with data based on
+            //refresh token
+        } else {
+            console.log("Invalid token, authentication needed");
+            res.sendFile(path.join(__dirname, 'public', 'index.html'));
+            //Template engine here as well? It may help with scaling site and adding links 
+            //and content that can be conditional based on presence of a valid token 
+        }
+
+    } else {
+        console.log("Invalid token, authentication needed");
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    }
+}) 
 
 async function run() {
 
@@ -46,7 +71,7 @@ async function run() {
     }
 }
 
-run().catch(console.error);
+// run().catch(console.error);
 
 // schedule the run() function to occur every Friday at 9am, Central Standard Time
 const scheduledRun = cron.schedule('* 9 * * Fri', () => {
@@ -57,6 +82,6 @@ const scheduledRun = cron.schedule('* 9 * * Fri', () => {
     timezone: "US/Central"
 });
 
-// scheduledRun.start();
+scheduledRun.start();
 
 
