@@ -82,7 +82,7 @@ auth.get('/callback', async function (req, res) {
                     await db.addOrUpdateUserInfo(userInfo);
                     res.redirect('/home');
                 })
-
+              
             } else {
                 res.redirect('/#' +
                     queryString.stringify({
