@@ -25,7 +25,7 @@ async function getUsers() {
     }
 }
 
-async function addOrUpdateUserInfo(userInfo) {
+async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
     const filterUserInfo = { "userId": userInfo.userId };
     const updateUserInfo = {
         $set: {
@@ -42,11 +42,23 @@ async function addOrUpdateUserInfo(userInfo) {
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
 
         if (result.matchedCount > 0 && result.modifiedCount > 0) {
-            console.log(`Document found using filter, ${result.modifiedCount} updates were made.`);
+            console.log(`Document found using filter, ${result.modifiedCount} update(s) made.`);
+
+            //if current user, no need to send confirmation email
+            requiresConfirmation = false;
+
         } else if (result.matchedCount > 0 && result.modifiedCount === 0 || null) {
-            console.log("Document found using filter, no updates were made.");
+            console.log("Document found using filter, no update made.");
+
+            //if current user, no need to send confirmation email
+            requiresConfirmation = false;
+
         } else {
-            console.log("No documents found using filter.")
+            console.log("No documents found using filter. Added user information and sending confirmation.")
+
+            //if new user, confirmation email needed
+            requiresConfirmation = true;
+            
         }
 
     } catch (error) {

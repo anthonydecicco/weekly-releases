@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const email = require('./email/email');
 const db = require('./utils/db');
 const path = require('path');
+const date = require('./utils/date')
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -67,13 +68,29 @@ async function run() {
 
         // console.log(formattedReleases);
 
-        await email.sendEmailToUser(user, formattedReleases);
+        const releasesOptions = {
+            from: {
+                name: 'Weekly Releases',
+                address: 'anthony@weeklyreleases.com',
+            },
+            to: user.userEmail,
+            subject: `\u{1F6A8}New Song Releases | ${date.todayDateString}\u{1F3A7}`,
+            template: 'releases',
+            context: {
+                todayDate: date.todayDateString,
+                userId: user.userId,
+                releases: formattedReleases,
+            }
+        }
+
+        await email.sendEmail(user, releasesOptions);
     }
 }
 
 // run().catch(console.error);
 
 // schedule the run() function to occur every Friday at 9am, Central Standard Time
+//For some reason this ran after 9am, and ran multiple times...
 const scheduledRun = cron.schedule('* 9 * * Fri', () => {
     console.log("Starting the 9am request for new releases...\n")
     run();
