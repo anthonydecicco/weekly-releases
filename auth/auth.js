@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const queryString = require('querystring');
 const request = require('request');
 const db = require('../utils/db')
+const email = require('../email/email');
+const date = require('../utils/date');
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
@@ -79,10 +81,36 @@ auth.get('/callback', async function (req, res) {
                     }
 
                     console.log("User info:\n" + userInfo.userEmail + "\n" + userInfo.userId + "\n" + userInfo.userTempAccessToken + "\n" + userInfo.userRefreshToken);
-                    await db.addOrUpdateUserInfo(userInfo);
+                    
+                    //create confirmation variable
+                    let requiresConfirmation = null;
+
+                    //if new user, requiresConfirmation set to true, otherwise false
+                    await db.addOrUpdateUserInfo(userInfo, requiresConfirmation);
+
+                    //if requiresConfirmation set to true, send confirmation email
+                    if (requiresConfirmation === true) {
+                        const confirmationOptions = {
+                            from: {
+                                name: 'Weekly Releases',
+                                address: 'anthony@weeklyreleases.com',
+                            },
+                            to: userInfo.userEmail,
+                            subject: `Thank you for signing up for Weekly Releases`,
+                            template: 'confirmation',
+                            context: {
+                                todayDate: date.todayDateString,
+                                userId: userInfo.userId,
+                                userEmail: userInfo.userEmail,
+                            }
+                        }
+
+                        await email.sendEmail(userInfo.userEmail, confirmationOptions);
+                    }
+
                     res.redirect('/home');
                 })
-              
+
             } else {
                 res.redirect('/#' +
                     queryString.stringify({
@@ -90,7 +118,6 @@ auth.get('/callback', async function (req, res) {
                     }));
             }
         });
-
     }
 })
 

@@ -28,7 +28,6 @@ const helpers = {
                     throw new Error('Invalid comparator');
             }
         } else {
-            // If variables are not valid numbers, perform string comparison
             switch (comparator) {
                 case '>':
                     return variableOne > variableTwo;
@@ -51,7 +50,7 @@ const helpers = {
     }
 }
 
-async function sendEmailToUser(user, releases) {
+async function sendEmail(userEmail, options) {
     const transporter = nodemailer.createTransport({
         pool: true,
         host: "smtp.forwardemail.net",
@@ -75,33 +74,17 @@ async function sendEmailToUser(user, releases) {
         },
         viewPath: path.resolve('./email'),
         extName: ".hbs",
-
     }
     
     transporter.use('compile', hbs(hbsOptions));
-    
-    const mailOptions = {
-        from: {
-            name: 'Weekly Releases',
-            address: 'anthony@weeklyreleases.com',
-        },
-        to: user.userEmail,
-        subject: `\u{1F6A8}New Song Releases | ${date.todayDateString}\u{1F3A7}`,
-        template: 'email',
-        context: {
-            todayDate: date.todayDateString,
-            userId: user.userId,
-            releases: releases,
-        }
-    }
-    
-    transporter.sendMail(mailOptions, (error, info) => {
+
+    transporter.sendMail(options, (error, info) => {
         if (error) {
             console.log(error);
         } else {
-            console.log("Email sent to " + user.userEmail + ". Response: " + info.response)
+            console.log("Email sent to " + userEmail + ". Response: " + info.response)
         }
     });
 }
 
-exports.sendEmailToUser = sendEmailToUser;
+exports.sendEmail = sendEmail;
