@@ -99,6 +99,6 @@ const scheduledRun = cron.schedule('* 9 * * Fri', () => {
     timezone: "US/Central"
 });
 
-// scheduledRun.start();
+scheduledRun.start();
 
 
