@@ -89,13 +89,12 @@ async function run() {
 
 // run().catch(console.error);
 
-// schedule the run() function to occur every Friday at 9am, Central Standard Time
-//For some reason this ran after 9am, and ran multiple times...
-const scheduledRun = cron.schedule('* 9 * * Fri', () => {
+// schedule the run() function to occur once, every Friday at 9am, Central Standard Time
+const scheduledRun = cron.schedule('0 9 * * Fri', () => {
     console.log("Starting the 9am request for new releases...\n")
     run();
 }, {
-    scheduled: false,
+    scheduled: true,
     timezone: "US/Central"
 });
 
