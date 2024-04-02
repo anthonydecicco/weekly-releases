@@ -106,8 +106,3 @@ https://www.npmjs.com/package/nodemon
 Node's querystring module for all engines. 
 
 https://www.npmjs.com/package/querystring
-
-### request (This is deprecated, need to update at some point)
-Request is designed to be the simplest way possible to make http calls. It supports HTTPS and follows redirects by default.
-
-https://www.npmjs.com/package/request
