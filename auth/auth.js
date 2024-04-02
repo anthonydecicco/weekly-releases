@@ -2,122 +2,128 @@ const express = require('express');
 const auth = express.Router();
 const crypto = require('crypto');
 const queryString = require('querystring');
-const request = require('request');
-const db = require('../utils/db')
+const db = require('../utils/db');
 const email = require('../email/email');
 const date = require('../utils/date');
+const functions = require('../utils/functions');
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const baseUrl = process.env.BASE_URL;
 const redirect_uri = baseUrl + "auth/callback";
 
-function generateRandomString(length) {
+async function generateRandomString(length) {
     return crypto
-    .randomBytes(60)
-    .toString('hex')
-    .slice(0, length);
+        .randomBytes(60)
+        .toString('hex')
+        .slice(0, length);
 }
 
 auth.get('/login', async function (req, res) {
-    const state = generateRandomString(16);
+    const state = await generateRandomString(16);
     const scope = 'user-read-private user-read-email user-follow-read user-follow-modify';
 
     res.redirect('https://accounts.spotify.com/authorize?' +
-    queryString.stringify({
-      response_type: 'code',
-      client_id: client_id,
-      scope: scope,
-      redirect_uri: redirect_uri,
-      state: state
-    }));
+        queryString.stringify({
+            response_type: 'code',
+            client_id: client_id,
+            scope: scope,
+            redirect_uri: redirect_uri,
+            state: state
+        }));
 })
 
 auth.get('/callback', async function (req, res) {
-    const code = req.query.code || null;
-    const state = req.query.state || null;
+    try {
+        const code = req.query.code || null;
+        const state = req.query.state || null;
 
-    if (state === null) {
-        res.redirect('/#' +
-            queryString.stringify({
-                error: 'state_mismatch'
-            }));
-    } else {
-        const authOptions = {
-            url: 'https://accounts.spotify.com/api/token',
-            form: {
-                code: code,
-                redirect_uri: redirect_uri,
-                grant_type: 'authorization_code'
-            },
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
-            },
-            json: true
-        };
+        if (state === null) {
+            res.redirect('/#' +
+                queryString.stringify({
+                    error: 'state_mismatch'
+                }));
+        } else {
+            const authOptions = {
+                url: 'https://accounts.spotify.com/api/token',
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
+                },
+                body: new URLSearchParams({
+                    code: code,
+                    redirect_uri: redirect_uri,
+                    grant_type: 'authorization_code'
+                }).toString(),
+                errorMessage: 'unable to complete /callback to Spotify',
+            };
 
-        request.post(authOptions, async function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                const access_token = body.access_token;
-                const refresh_token = body.refresh_token;
+            const authResponse = await functions.handleRequest(
+                authOptions.url,
+                authOptions.method,
+                authOptions.headers,
+                authOptions.body,
+                authOptions.errorMessage,
+            )
 
-                res.cookie('refresh_token', refresh_token, { maxAge: 900000, httpOnly: true });
+            const access_token = authResponse.access_token;
+            const refresh_token = authResponse.refresh_token;
 
-                const userOptions = {
-                    url: 'https://api.spotify.com/v1/me',
-                    headers: { 'Authorization': 'Bearer ' + access_token },
-                    json: true
+            res.cookie('refresh_token', refresh_token, { maxAge: 900000, httpOnly: true });
+
+            const userOptions = {
+                url: 'https://api.spotify.com/v1/me',
+                method: 'GET',
+                headers: { 'Authorization': 'Bearer ' + access_token },
+                errorMessage: 'unable to get user account information within /callback'
+            }
+
+            const userDetailResponse = await functions.handleRequest(
+                userOptions.url,
+                userOptions.method,
+                userOptions.headers,
+                null,
+                userOptions.errorMessage,
+            );
+
+            const userInfo = {
+                userId: userDetailResponse.id,
+                userEmail: userDetailResponse.email,
+                userTempAccessToken: access_token,
+                userRefreshToken: refresh_token
+            }
+
+            //create confirmation variable
+            let requiresConfirmation = null;
+
+            //if new user, requiresConfirmation set to true, otherwise false
+            await db.addOrUpdateUserInfo(userInfo, requiresConfirmation);
+
+            //if requiresConfirmation set to true, send confirmation email
+            if (requiresConfirmation === true) {
+                const confirmationOptions = {
+                    from: {
+                        name: 'Weekly Releases',
+                        address: 'anthony@weeklyreleases.com',
+                    },
+                    to: userInfo.userEmail,
+                    subject: `Thank you for signing up for Weekly Releases`,
+                    template: 'confirmation',
+                    context: {
+                        todayDate: date.todayDateString,
+                        userId: userInfo.userId,
+                        userEmail: userInfo.userEmail,
+                    }
                 }
 
-                request.get(userOptions, async function (error, response, body) {
-                    const user = body;
-
-                    const userInfo = {
-                        userId: user.id,
-                        userEmail: user.email,
-                        userTempAccessToken: access_token,
-                        userRefreshToken: refresh_token
-                    }
-
-                    console.log("User info:\n" + userInfo.userEmail + "\n" + userInfo.userId + "\n" + userInfo.userTempAccessToken + "\n" + userInfo.userRefreshToken);
-                    
-                    //create confirmation variable
-                    let requiresConfirmation = null;
-
-                    //if new user, requiresConfirmation set to true, otherwise false
-                    await db.addOrUpdateUserInfo(userInfo, requiresConfirmation);
-
-                    //if requiresConfirmation set to true, send confirmation email
-                    if (requiresConfirmation === true) {
-                        const confirmationOptions = {
-                            from: {
-                                name: 'Weekly Releases',
-                                address: 'anthony@weeklyreleases.com',
-                            },
-                            to: userInfo.userEmail,
-                            subject: `Thank you for signing up for Weekly Releases`,
-                            template: 'confirmation',
-                            context: {
-                                todayDate: date.todayDateString,
-                                userId: userInfo.userId,
-                                userEmail: userInfo.userEmail,
-                            }
-                        }
-
-                        await email.sendEmail(userInfo.userEmail, confirmationOptions);
-                    }
-
-                    res.redirect('/home');
-                })
-
-            } else {
-                res.redirect('/#' +
-                    queryString.stringify({
-                        error: 'invalid_token'
-                    }));
+                await email.sendEmail(userInfo.userEmail, confirmationOptions);
             }
-        });
+
+            res.redirect('/home');
+        }
+    } catch (error) {
+        console.error(error);
     }
 })
 
@@ -125,34 +131,32 @@ auth.post('/refresh_token', async function (req, res) {
     try {
         const refresh_token = req.body.refresh_token; 
 
-        const authOptions = {
+        const refreshOptions = {
             url: 'https://accounts.spotify.com/api/token',
+            method: 'POST',
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Basic ' + (new Buffer.from(client_id + ':' + client_secret).toString('base64'))
             },
-            form: {
+            body: new URLSearchParams({
                 grant_type: 'refresh_token',
-                refresh_token: refresh_token
-            },
-            json: true
+                refresh_token: refresh_token,
+            }).toString(),
+            errorMessage: 'unable to get a new refresh token from Spotify'
         };
 
-        const response = await fetch(authOptions.url, {
-            method: 'POST',
-            body: new URLSearchParams(authOptions.form),
-            headers: authOptions.headers
-        });
+        const refreshTokenResponse = await functions.handleRequest(
+            refreshOptions.url,
+            refreshOptions.method,
+            refreshOptions.headers,
+            refreshOptions.body,
+            refreshOptions.errorMessage,
+        )
 
-        if (response.ok) {
-            const data = await response.json();
-            res.json(data);
-        } else {
-            res.status(response.status).json({ error: 'Failed to refresh token' });
-        }
+        res.json(refreshTokenResponse);
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
