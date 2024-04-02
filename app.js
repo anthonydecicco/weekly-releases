@@ -66,7 +66,7 @@ async function run() {
         const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
         const formattedReleases = await functions.formatReleases(sortedReleases);
 
-        // console.log(formattedReleases);
+        console.log(formattedReleases);
 
         const releasesOptions = {
             from: {

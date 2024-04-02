@@ -1,8 +1,18 @@
 const date = require('./date');
 
-async function handleRequest(url, headers) {
+async function handleRequest(url, method, headers, body = null, errorMessage = null) {
+    let options = {
+        method: method,
+        headers: headers,
+    }
+    
+    if (body !== null) {
+        options.body = body;
+    }
+
     try {
-        const response = await fetch(url, { method: 'GET', headers: headers });
+        const response = await fetch(url, options);
+        
         if (response.ok) {
             return await response.json();
 
@@ -17,17 +27,36 @@ async function handleRequest(url, headers) {
             console.log(response.status + response.body);
         }
     } catch (error) {
-        console.error("Error handling request: ", error);
+        if (errorMessage !== null) {
+            console.log("User inputted error message: " + errorMessage);
+            console.error("Error handling request: ", error)
+        } else {
+            console.error("Error handling request: ", error)
+        }
     }
 }
 
-async function getNextPageOfArtists(url, headers, followedArtists) {
+async function getNextPageOfArtists(url, method, headers, followedArtists) {
     if (url !== null) {
-        const additionalArtists = await handleRequest(url, headers)
+        const errorMessage = 'unable to get the next page of followed artists'
+
+        const additionalArtists = await handleRequest(
+            url,
+            method,
+            headers,
+            null,
+            errorMessage);
+        
         followedArtists.push(...additionalArtists.artists.items);
 
         if (additionalArtists.artists.next !== null) {
-            await getNextPageOfArtists(additionalArtists.artists.next, headers, followedArtists) //each subsequent call should be awaited
+            await getNextPageOfArtists(
+                additionalArtists.artists.next,
+                method,
+                headers,
+                followedArtists
+            ) //each subsequent call should be awaited
+
         } else {
             return;
         }
@@ -40,25 +69,53 @@ async function getFollowedArtists(user) {
 
     const followedArtistsOptions = {
         url: 'https://api.spotify.com/v1/me/following?type=artist&limit=50',
+        method: 'GET',
         headers: { 'Authorization': 'Bearer ' + access_token },
+        errorMessage: 'unable to get initial request for followed artists'
     };
 
-    const data = await handleRequest(followedArtistsOptions.url, followedArtistsOptions.headers);
+    const data = await handleRequest(
+        followedArtistsOptions.url,
+        followedArtistsOptions.method,
+        followedArtistsOptions.headers,
+        null,
+        followedArtistsOptions.errorMessage,
+    );
 
     let followedArtists = data.artists.items;
 
-    await getNextPageOfArtists(data.artists.next, followedArtistsOptions.headers, followedArtists);
+    await getNextPageOfArtists(
+        data.artists.next,
+        followedArtistsOptions.method,
+        followedArtistsOptions.headers,
+        followedArtists
+    );
 
     return followedArtists;
 }
 
-async function getNextPageOfReleases(url, headers, releases) {
+async function getNextPageOfReleases(url, method, headers, releases) {
     if (url !== null) {
-        const additionalReleases = await handleRequest(url, headers);
+        const errorMessage = 'unable to get next page of releases from followed artist'
+
+        const additionalReleases = await handleRequest(
+            url,
+            method,
+            headers,
+            null,
+            errorMessage
+        );
+
         releases.push(...additionalReleases.items);
 
         if (additionalReleases.next !== null) {
-            await getNextPageOfReleases(additionalReleases.next, headers, releases);
+            await getNextPageOfReleases(
+                additionalReleases.next,
+                method,
+                headers,
+                releases
+            );
+
         } else {
             return;
         }
@@ -76,14 +133,26 @@ async function getReleasesByArtist(user, followedArtists) {
 
         const releasesOptions = {
             url: `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album,single&market=US&limit=50`,
+            method: 'GET',
             headers: { 'Authorization': 'Bearer ' + access_token },
+            errorMessage: `unable to get initial request for releases from artist id: ${artist.id}`,
         };
 
-        const data = await handleRequest(releasesOptions.url, releasesOptions.headers);
+        const data = await handleRequest(
+            releasesOptions.url,
+            releasesOptions.method,
+            releasesOptions.headers,
+            null,
+            releasesOptions.errorMessage,
+        );
 
         let artistReleases = data.items;
 
-        await getNextPageOfReleases(data.next, releasesOptions.headers, releases);
+        await getNextPageOfReleases(
+            data.next,
+            releasesOptions.method,
+            releasesOptions.headers,
+            releases);
 
         releases.push(...artistReleases);
     }
@@ -96,17 +165,17 @@ async function filterReleases(releases, numberOfDaysToFilterBy) {
     
     //filter releases by a certain number of days
     const timeFrame = Date.now() - (numberOfDaysToFilterBy * 24 * 60 * 60 * 1000);
-    const filteredReleases = releases.filter(release => Date.parse(release.release_date) > timeFrame);
+    const filteredReleases = await releases.filter(release => Date.parse(release.release_date) > timeFrame);
 
     //remove duplicates
-    const releaseIds = filteredReleases.map(({ id }) => id);
-    const uniqueFilteredReleases = filteredReleases.filter(({ id }, index) => !releaseIds.includes(id, index + 1));
+    const releaseIds = await filteredReleases.map(({ id }) => id);
+    const uniqueFilteredReleases = await filteredReleases.filter(({ id }, index) => !releaseIds.includes(id, index + 1));
 
     return uniqueFilteredReleases;
 }
 
 async function sortReleasesByMostRecent(releases) {
-    return releases.sort((a, b) => 
+    return await releases.sort((a, b) => 
         Date.parse(b.release_date) - Date.parse(a.release_date)
     )
 }
@@ -136,6 +205,7 @@ async function formatReleases(releases) {
     return releases;
 }
 
+exports.handleRequest = handleRequest;
 exports.getFollowedArtists = getFollowedArtists;
 exports.getReleasesByArtist = getReleasesByArtist;
 exports.sortReleasesByMostRecent = sortReleasesByMostRecent;

@@ -1,30 +1,36 @@
 const db = require('../utils/db');
+const functions = require('../utils/functions');
 
 const baseUrl = process.env.BASE_URL;
+const refreshUrl = baseUrl + 'auth/refresh_token';
 
 async function refreshAccessTokens(users) {
-    for (const user of users) {
-        try {
-            const response = await fetch(baseUrl + "auth/refresh_token", {
-                method: "POST",
-                body: JSON.stringify({ refresh_token: user.userRefreshToken }),
+    try {
+        for (const user of users) {
+
+            const refreshOptions = {
+                url: refreshUrl,
+                method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
-            })
-            if (response.ok) {
-                const data = await response.json();
-
-                user.userTempAccessToken = data.access_token;
-
-                await db.addOrUpdateUserInfo(user);
-
-            } else {
-                console.log("Failed to refresh tokens for user:", user);
+                body: JSON.stringify({ refresh_token: user.userRefreshToken }),
+                errorMessage: `unable to get a new refresh token for user: ${user.userId}`
             }
-        } catch (error) {
-            console.log(error)
+
+            const response = await functions.handleRequest(
+                refreshOptions.url,
+                refreshOptions.method,
+                refreshOptions.headers,
+                refreshOptions.body,
+                refreshOptions.errorMessage,
+            );
+
+            user.userTempAccessToken = response.access_token;
+            await db.addOrUpdateUserInfo(user);
         }
+    } catch (error) {
+        console.log(error)
     }
     return users;
 }
