@@ -34,9 +34,10 @@ Spotify does address this through their Release Radar playlist, however, it only
 
 ### Roadmap
 - Continue building out the front-end. I'm currently working with a designer to develop a more processed look and feel for the site.
+- Continue working on getting the application production ready.
+- Update deprecated packages used in Spotify's Code Flow example.
 - Deploy the application.
 - Apply for an increased API rate limit from Spotify.
-- Update deprecated packages used in Spotify's Code Flow example.
 
 ### Long-Term Features
 Ideally, these are the features I would love to be able to add at some point. I have done minimal research around some of these, so I'm still not 100% on feasibility.
@@ -77,6 +78,16 @@ Fast, unopinionated, minimalist web framework for Node.js.
 
 https://www.npmjs.com/package/express 
 
+### express-rate-limit
+Basic rate-limiting middleware for Express. Use to limit repeated requests to public APIs and/or endpoints such as password reset. Plays nice with express-slow-down and ratelimit-header-parser.
+
+https://www.npmjs.com/package/express-rate-limit
+
+### helmet
+Helmet helps secure Express apps by setting HTTP response headers.
+
+https://www.npmjs.com/package/helmet
+
 ### mongodb
 The official MongoDB driver for Node.js.
 
@@ -106,3 +117,8 @@ https://www.npmjs.com/package/nodemon
 Node's querystring module for all engines. 
 
 https://www.npmjs.com/package/querystring
+
+### winston
+winston is designed to be a simple and universal logging library with support for multiple transports. A transport is essentially a storage device for your logs. Each winston logger can have multiple transports configured at different levels. For example, one may want error logs to be stored in a persistent remote location (like a database), but all logs output to the console or a local file.
+
+https://www.npmjs.com/package/winston

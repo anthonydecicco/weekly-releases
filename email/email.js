@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const date = require('../utils/date');
 const path = require('path');
+const logger = require('../utils/logger');
 
 const helpers = {
     compare(variableOne, comparator, variableTwo) {
@@ -80,9 +81,9 @@ async function sendEmail(userEmail, options) {
 
     transporter.sendMail(options, (error, info) => {
         if (error) {
-            console.log(error);
+            logger.error(error);
         } else {
-            console.log("Email sent to " + userEmail + ". Response: " + info.response)
+            logger.info("Email sent to " + userEmail + ". Response: " + info.response)
         }
     });
 }

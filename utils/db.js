@@ -1,4 +1,5 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const logger = require('./logger');
 const mongoDbString = process.env.DATABASE_URL;
 
 const client = new MongoClient(mongoDbString, {
@@ -19,7 +20,7 @@ async function getUsers() {
         const users = await cursor.toArray();
         return users;
     } catch (error) {
-        console.error("Error fetching users: " + error);
+        logger.error("Error fetching users: " + error);
     } finally {
         await client.close();
     }
@@ -42,19 +43,19 @@ async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
 
         if (result.matchedCount > 0 && result.modifiedCount > 0) {
-            console.log(`Document found using filter, ${result.modifiedCount} update(s) made.`);
+            logger.info(`Document found using filter, ${result.modifiedCount} update(s) made.`);
 
             //if current user, no need to send confirmation email
             requiresConfirmation = false;
 
         } else if (result.matchedCount > 0 && result.modifiedCount === 0 || null) {
-            console.log("Document found using filter, no update made.");
+            logger.info("Document found using filter, no update made.");
 
             //if current user, no need to send confirmation email
             requiresConfirmation = false;
 
         } else {
-            console.log("No documents found using filter. Added user information and sending confirmation.")
+            logger.info("No documents found using filter. Added user information and sending confirmation.")
 
             //if new user, confirmation email needed
             requiresConfirmation = true;
@@ -62,7 +63,7 @@ async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
         }
 
     } catch (error) {
-        console.log("error:" + error);
+        logger.error("Error adding/updating user info" + error);
     }
     finally {
         await client.close();
@@ -81,15 +82,15 @@ async function checkForRefreshToken(refreshTokenCookie) {
                 const userRefreshToken = result.userRefreshToken;
                 return userRefreshToken;
             } else {
-                console.log("No document found using the submitted refresh token.")
+                logger.info("No document found using the submitted refresh token.")
             }
         } catch (error) {
-            console.log("Error: " + error)
+            logger.error("Error checking for refresh token:" + error)
         } finally {
             await client.close();
         }
     } else {
-        console.log("refreshTokenCookie = null");
+        logger.info("refreshTokenCookie = null");
     }
 }
 

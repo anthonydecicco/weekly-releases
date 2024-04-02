@@ -6,6 +6,7 @@ const db = require('../utils/db');
 const email = require('../email/email');
 const date = require('../utils/date');
 const functions = require('../utils/functions');
+const logger = require('../utils/logger');
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
@@ -123,7 +124,7 @@ auth.get('/callback', async function (req, res) {
             res.redirect('/home');
         }
     } catch (error) {
-        console.error(error);
+        logger.error(error);
     }
 })
 
@@ -156,7 +157,7 @@ auth.post('/refresh_token', async function (req, res) {
         res.json(refreshTokenResponse);
 
     } catch (error) {
-        console.error(error);
+        logger.error(error);
     }
 });
 

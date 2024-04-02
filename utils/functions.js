@@ -1,4 +1,5 @@
 const date = require('./date');
+const logger = require('../utils/logger');
 
 async function handleRequest(url, method, headers, body = null, errorMessage = null) {
     let options = {
@@ -18,20 +19,19 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
         } else if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
-            console.log("Status Code: 429. Will re-try in " + retryAfter + " seconds");
+            logger.warn("Status Code: 429. Will re-try in " + retryAfter + " seconds");
 
             const retryAfterMs = parseInt(retryAfter) * 1000;
             await new Promise(resolve => setTimeout(resolve, retryAfterMs));
 
         } else {
-            console.log(response.status + response.body);
+            logger.error(response.status + response.body);
         }
     } catch (error) {
         if (errorMessage !== null) {
-            console.log("User inputted error message: " + errorMessage);
-            console.error("Error handling request: ", error)
+            logger.error("Error handling request: ", errorMessage)
         } else {
-            console.error("Error handling request: ", error)
+            logger.error("Error handling request: ", error)
         }
     }
 }
@@ -64,7 +64,7 @@ async function getNextPageOfArtists(url, method, headers, followedArtists) {
 }
 
 async function getFollowedArtists(user) {
-    console.log("Currently fetching " + user.userId + "'s followed artists...")
+    logger.info("Currently fetching " + user.userId + "'s followed artists...")
     const access_token = user.userTempAccessToken;
 
     const followedArtistsOptions = {
@@ -125,7 +125,7 @@ async function getNextPageOfReleases(url, method, headers, releases) {
 }
 
 async function getReleasesByArtist(user, followedArtists) {
-    console.log("Currently fetching releases from the array of followed artists...")
+    logger.info("Currently fetching releases from the array of followed artists...")
     const access_token = user.userTempAccessToken;
     let releases = [];
 
@@ -157,7 +157,7 @@ async function getReleasesByArtist(user, followedArtists) {
         releases.push(...artistReleases);
     }
 
-    console.log("The " + followedArtists.length + " followed artists collectively have " + releases.length + " releases.")
+    logger.info("The " + followedArtists.length + " followed artists collectively have " + releases.length + " releases.")
     return releases;
 }
 

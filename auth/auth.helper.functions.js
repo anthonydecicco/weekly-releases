@@ -1,5 +1,6 @@
 const db = require('../utils/db');
 const functions = require('../utils/functions');
+const logger = require('../utils/logger');
 
 const baseUrl = process.env.BASE_URL;
 const refreshUrl = baseUrl + 'auth/refresh_token';
@@ -30,7 +31,7 @@ async function refreshAccessTokens(users) {
             await db.addOrUpdateUserInfo(user);
         }
     } catch (error) {
-        console.log(error)
+        logger.error(error)
     }
     return users;
 }

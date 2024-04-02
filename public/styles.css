@@ -41,6 +41,12 @@ nav {
     margin: 0px 40px 0px 40px;
 }
 
+.spotify-logo {
+    width: 100px;
+    height: auto;
+    margin: 0 10px 0 10px;
+}
+
 .footer-spacing {
     flex-grow: 1;
 }
@@ -59,5 +65,14 @@ main > p > a, main > ul > li > p > a {
 }
 
 .special-note {
+    font-style: italic;
+}
+
+.flex-container {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    height: fit-content;
+    align-items: center;
     font-style: italic;
 }
