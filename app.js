@@ -11,7 +11,6 @@ const db = require('./utils/db');
 const path = require('path');
 const date = require('./utils/date');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const logger = require('./utils/logger');
 
 const app = express();
@@ -19,12 +18,6 @@ const port = process.env.PORT || 8080;
 
 app.disable('x-powered-by');
 
-const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 20,
-})
-
-app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
