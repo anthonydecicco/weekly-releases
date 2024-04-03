@@ -95,11 +95,8 @@ auth.get('/callback', async function (req, res) {
                 userRefreshToken: refresh_token
             }
 
-            //create confirmation variable
-            let requiresConfirmation = null;
-
-            //if new user, requiresConfirmation set to true, otherwise false
-            await db.addOrUpdateUserInfo(userInfo, requiresConfirmation);
+            //create requiresConfirmation and redirectCheck variables
+            const { requiresConfirmation, redirectCheck } = await db.addOrUpdateUserInfo(userInfo, requiresConfirmation, redirectCheck);
 
             //if requiresConfirmation set to true, send confirmation email
             if (requiresConfirmation === true) {
@@ -121,10 +118,16 @@ auth.get('/callback', async function (req, res) {
                 await email.sendEmail(userInfo.userEmail, confirmationOptions);
             }
 
+            //if the addOrUpdateUserInfo function failed, redirect
+            if (redirectCheck === true) {
+                res.redirect('/database-failure');
+            }
+
             res.redirect('/home');
         }
     } catch (error) {
         logger.error(error);
+        res.redirect('/spotify-callback-failure');
     }
 })
 
@@ -143,7 +146,7 @@ auth.post('/refresh_token', async function (req, res) {
                 grant_type: 'refresh_token',
                 refresh_token: refresh_token,
             }).toString(),
-            errorMessage: 'unable to get a new refresh token from Spotify'
+            errorMessage: 'unable to get a new refresh token from Spotify '
         };
 
         const refreshTokenResponse = await functions.handleRequest(
