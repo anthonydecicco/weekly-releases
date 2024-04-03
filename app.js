@@ -95,9 +95,9 @@ async function run() {
 
 // run().catch(console.error);
 
-// schedule the run() function to occur once, every Friday at 9am, Central Standard Time
-const scheduledRun = cron.schedule('0 9 * * Fri', () => {
-    logger.info("Starting the 9am request for new releases...\n")
+// schedule the run() function to occur once, every Friday at 8am, Central Standard Time
+const scheduledRun = cron.schedule('0 8 * * Fri', () => {
+    logger.info("Starting the 8am request for new releases...\n")
 
     run().catch((error) => {
         logger.error(error);
