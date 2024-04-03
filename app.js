@@ -15,7 +15,7 @@ const rateLimit = require('express-rate-limit');
 const logger = require('./utils/logger');
 
 const app = express();
-app.set('trust proxy', 1)
+app.set('trust proxy', process.env.PROXY)
 app.get('/ip', (request, response) => response.send(request.ip))
 
 const port = process.env.PORT || 8080;
@@ -23,8 +23,10 @@ const port = process.env.PORT || 8080;
 app.disable('x-powered-by');
 
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000,
-    max: 30,
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
 })
 
 app.use(limiter);
@@ -33,7 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/', router);
-app.use('/auth', auth);
+app.use('/auth', limiter, auth);
 app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
