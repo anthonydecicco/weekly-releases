@@ -26,7 +26,7 @@ async function getUsers() {
     }
 }
 
-async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
+async function addOrUpdateUserInfo(userInfo, requiresConfirmation, redirectCheck) {
     const filterUserInfo = { "userId": userInfo.userId };
     const updateUserInfo = {
         $set: {
@@ -48,7 +48,7 @@ async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
             //if current user, no need to send confirmation email
             requiresConfirmation = false;
 
-        } else if (result.matchedCount > 0 && result.modifiedCount === 0 || null) {
+        } else if (result.matchedCount > 0 && (result.modifiedCount === 0 || null)) {
             logger.info("Document found using filter, no update made.");
 
             //if current user, no need to send confirmation email
@@ -62,11 +62,18 @@ async function addOrUpdateUserInfo(userInfo, requiresConfirmation) {
             
         }
 
+        redirectCheck = false;
+
     } catch (error) {
-        logger.error("Error adding/updating user info" + error);
+        logger.error("Error adding/updating user info " + error);
+        
+        //if this process fails, redirect user to error page
+        redirectCheck = true;
+
     }
     finally {
         await client.close();
+        return { requiresConfirmation, redirectCheck };
     }
 }
 
