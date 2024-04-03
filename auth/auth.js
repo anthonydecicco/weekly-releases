@@ -94,9 +94,9 @@ auth.get('/callback', async function (req, res) {
                 userTempAccessToken: access_token,
                 userRefreshToken: refresh_token
             }
-
+            
             //create requiresConfirmation and redirectCheck variables
-            const { requiresConfirmation, redirectCheck } = await db.addOrUpdateUserInfo(userInfo, requiresConfirmation, redirectCheck);
+            const { requiresConfirmation, redirectCheck } = await db.addOrUpdateUserInfo(userInfo);
 
             //if requiresConfirmation set to true, send confirmation email
             if (requiresConfirmation === true) {
