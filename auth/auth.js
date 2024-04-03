@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-const baseUrl = process.env.BASE_URL;
+const baseUrl = process.env.BASE_URL || 'http://localhost:8080/';
 const redirect_uri = baseUrl + "auth/callback";
 
 async function generateRandomString(length) {
