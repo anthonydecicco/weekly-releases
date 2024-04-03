@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/', router);
-app.use('/auth', limiter, auth);
+app.use('/auth', auth);
 app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
