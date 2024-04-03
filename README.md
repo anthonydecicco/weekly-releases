@@ -4,6 +4,8 @@
 ### Summary
 An application that uses the Spotify Web API to fetch a user's followed artists, and from there, fetch the releases from each of the artists and filter for releases that came out in the last 7 days. New releases are then emailed to the user on a weekly basis.
 
+You can visit the site at this URL: https://www.weeklyreleases.com/
+
 ### Purpose
 I love to listen to music, and I listen to a lot of different genres and artists. About a year ago I found it getting hard to keep track of new music that my favorite artists were releasing. I stopped using social media a few years ago, which was my main source of information for staying up-to-date on new releases. Sometimes I would find out weeks, months, or even a year later that a new album dropped from one of my favorite artists.
 
