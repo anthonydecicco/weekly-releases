@@ -15,13 +15,16 @@ const rateLimit = require('express-rate-limit');
 const logger = require('./utils/logger');
 
 const app = express();
+app.set('trust proxy', 1)
+app.get('/ip', (request, response) => response.send(request.ip))
+
 const port = process.env.PORT || 8080;
 
 app.disable('x-powered-by');
 
 const limiter = rateLimit({
     windowMs: 1 * 60 * 1000,
-    max: 20,
+    max: 30,
 })
 
 app.use(limiter);
