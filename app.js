@@ -11,25 +11,13 @@ const db = require('./utils/db');
 const path = require('path');
 const date = require('./utils/date');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const logger = require('./utils/logger');
 
 const app = express();
-app.set('trust proxy', process.env.PROXY)
-app.get('/ip', (request, response) => response.send(request.ip))
-
 const port = process.env.PORT || 8080;
 
 app.disable('x-powered-by');
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false,
-})
-
-app.use(limiter);
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
