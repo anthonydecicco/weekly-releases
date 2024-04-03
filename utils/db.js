@@ -26,7 +26,7 @@ async function getUsers() {
     }
 }
 
-async function addOrUpdateUserInfo(userInfo, requiresConfirmation, redirectCheck) {
+async function addOrUpdateUserInfo(userInfo) {
     const filterUserInfo = { "userId": userInfo.userId };
     const updateUserInfo = {
         $set: {
@@ -36,6 +36,9 @@ async function addOrUpdateUserInfo(userInfo, requiresConfirmation, redirectCheck
         }
     }
     const updateOptions = { upsert: true };
+    
+    let requiresConfirmation = null;
+    let redirectCheck = null;
 
     try {
         await client.connect();
