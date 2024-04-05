@@ -64,7 +64,6 @@ async function getNextPageOfArtists(url, method, headers, followedArtists) {
 }
 
 async function getFollowedArtists(user) {
-    logger.info("Currently fetching " + user.userId + "'s followed artists...")
     const access_token = user.userTempAccessToken;
 
     const followedArtistsOptions = {
@@ -125,7 +124,6 @@ async function getNextPageOfReleases(url, method, headers, releases) {
 }
 
 async function getReleasesByArtist(user, followedArtists) {
-    logger.info("Currently fetching releases from the array of followed artists...")
     const access_token = user.userTempAccessToken;
     let releases = [];
 
@@ -157,7 +155,6 @@ async function getReleasesByArtist(user, followedArtists) {
         releases.push(...artistReleases);
     }
 
-    logger.info("The " + followedArtists.length + " followed artists collectively have " + releases.length + " releases.")
     return releases;
 }
 

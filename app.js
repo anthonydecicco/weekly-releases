@@ -26,6 +26,7 @@ app.use('/', router);
 app.use('/auth', auth);
 app.use(express.static('public'));
 
+//this doesn't seem to work as expected
 app.get('/', async (req, res) => {
     const refreshTokenCookie = req.cookies.refresh_token;
 
@@ -56,6 +57,8 @@ async function run() {
     await authFunctions.refreshAccessTokens(users);
 
     for (const user of users) {
+        logger.info(`Fetching artists and releases for ${user.userEmail}...`);
+
         const followedArtists = await functions.getFollowedArtists(user);
         let releases = await functions.getReleasesByArtist(user, followedArtists);
 
@@ -65,7 +68,8 @@ async function run() {
         const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
         const formattedReleases = await functions.formatReleases(sortedReleases);
 
-        logger.info(formattedReleases);
+        const now = new Date();
+        const today = date.getTodayDateString(now);
 
         const releasesOptions = {
             from: {
@@ -73,15 +77,16 @@ async function run() {
                 address: 'anthony@weeklyreleases.com',
             },
             to: user.userEmail,
-            subject: `\u{1F6A8}New Song Releases | ${date.todayDateString}\u{1F3A7}`,
+            subject: `\u{1F6A8}New Song Releases | ${today}\u{1F3A7}`,
             template: 'releases',
             context: {
-                todayDate: date.todayDateString,
+                todayDate: today,
                 userId: user.userId,
                 releases: formattedReleases,
             }
         }
 
+        logger.info(`${user.userEmail} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`)
         await email.sendEmail(user.userEmail, releasesOptions);
     }
 } 
