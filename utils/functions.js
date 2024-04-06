@@ -180,7 +180,7 @@ async function sortReleasesByMostRecent(releases) {
 async function formatReleases(releases) {
     for (let release of releases) {
         //format release dates from YYYY-MM-DD to MM/DD/YYYY format
-        release.release_date = date.formatSpotifyDate(release.release_date);
+        release.release_date = await date.formatSpotifyDate(release.release_date);
 
         //create a new array that converts .artists to a nicely formatted string
         let listOfArtists = [];

@@ -1,4 +1,4 @@
-function getTodayDateString(now) {
+async function getTodayDateString(now) {
 	const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 	const months = [
 		"January",
@@ -24,7 +24,7 @@ function getTodayDateString(now) {
 	return todayDateString;
 }
 
-function formatSpotifyDate(date) {
+async function formatSpotifyDate(date) {
 	//format of spotify's date is yyyy-mm-dd
 	const datePartsArr = date.split('-')
 
