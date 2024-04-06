@@ -37,9 +37,9 @@ Spotify does address this through their Release Radar playlist, however, it only
 ### Roadmap
 - Continue building out the front-end. I'm currently working with a designer to develop a more processed look and feel for the site.
 - ~Continue working on getting the application production ready.~
-- Update deprecated packages used in Spotify's Code Flow example.
+- ~Update deprecated packages used in Spotify's Code Flow example.~
 - ~Deploy the application.~
-- Apply for an increased API rate limit from Spotify.
+- ~Apply for an increased API rate limit from Spotify.~
 - Continue improving application.
 
 ### Long-Term Features
@@ -110,11 +110,6 @@ https://www.npmjs.com/package/nodemailer-express-handlebars
 nodemon is a tool that helps develop Node.js based applications by automatically restarting the node application when file changes in the directory are detected.
 
 https://www.npmjs.com/package/nodemon
-
-### querystring (This is deprecated, need to update at some point)
-Node's querystring module for all engines. 
-
-https://www.npmjs.com/package/querystring
 
 ### winston
 winston is designed to be a simple and universal logging library with support for multiple transports. A transport is essentially a storage device for your logs. Each winston logger can have multiple transports configured at different levels. For example, one may want error logs to be stored in a persistent remote location (like a database), but all logs output to the console or a local file.

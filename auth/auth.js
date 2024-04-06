@@ -1,37 +1,31 @@
 const express = require('express');
 const auth = express.Router();
 const crypto = require('crypto');
-const queryString = require('querystring');
 const db = require('../utils/db');
 const email = require('../email/email');
 const date = require('../utils/date');
 const functions = require('../utils/functions');
 const logger = require('../utils/logger');
+const util = require('util');
+const randomBytesAsync = util.promisify(crypto.randomBytes);
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const baseUrl = process.env.BASE_URL || 'http://localhost:8080/';
 const redirect_uri = baseUrl + "auth/callback";
 
-async function generateRandomString(length) {
-    return crypto
-        .randomBytes(60)
-        .toString('hex')
-        .slice(0, length);
+function generateRandomString(length) {  
+    return randomBytesAsync(60).toString('hex').slice(0, length);
 }
 
 auth.get('/login', async function (req, res) {
-    const state = await generateRandomString(16);
+    let state = generateRandomString(16);
+    // state = await state.toString('hex').slice(0, length);
     const scope = 'user-read-private user-read-email user-follow-read user-follow-modify';
+    
+    const queryParams = `response_type=code&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=${state}`
+    res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
 
-    res.redirect('https://accounts.spotify.com/authorize?' +
-        queryString.stringify({
-            response_type: 'code',
-            client_id: client_id,
-            scope: scope,
-            redirect_uri: redirect_uri,
-            state: state
-        }));
 })
 
 auth.get('/callback', async function (req, res) {
@@ -40,10 +34,7 @@ auth.get('/callback', async function (req, res) {
         const state = req.query.state || null;
 
         if (state === null) {
-            res.redirect('/#' +
-                queryString.stringify({
-                    error: 'state_mismatch'
-                }));
+            res.redirect('/#error=state_mismatch');
         } else {
             const authOptions = {
                 url: 'https://accounts.spotify.com/api/token',
