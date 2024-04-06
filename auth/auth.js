@@ -19,13 +19,11 @@ function generateRandomString(length) {
 }
 
 auth.get('/login', async function (req, res) {
-    let state = generateRandomString(16);
-    // state = await state.toString('hex').slice(0, length);
+    const state = generateRandomString(16);
     const scope = 'user-read-private user-read-email user-follow-read user-follow-modify';
     
     const queryParams = `response_type=code&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=${state}`
     res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
-
 })
 
 auth.get('/callback', async function (req, res) {
