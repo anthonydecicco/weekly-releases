@@ -67,9 +67,10 @@ async function run() {
         const filteredReleases = await functions.filterReleases(releases, numberOfDays);
         const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
         const formattedReleases = await functions.formatReleases(sortedReleases);
-
+        
         const now = new Date();
-        const today = date.getTodayDateString(now);
+        const today = await date.getTodayDateString(now);
+        const subject = await email.handleSubject(formattedReleases, today);
 
         const releasesOptions = {
             from: {
@@ -77,11 +78,10 @@ async function run() {
                 address: 'anthony@weeklyreleases.com',
             },
             to: user.userEmail,
-            subject: `\u{1F6A8}New Song Releases | ${today}\u{1F3A7}`,
+            subject: subject,
             template: 'releases',
             context: {
                 todayDate: today,
-                userId: user.userId,
                 releases: formattedReleases,
             }
         }
@@ -91,7 +91,7 @@ async function run() {
     }
 } 
 
-// run().catch(console.error);
+// await run().catch(console.error);
 
 // schedule the run() function to occur once, every Friday at 8am, Central Standard Time
 const scheduledRun = cron.schedule('0 8 * * Fri', () => {

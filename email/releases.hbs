@@ -69,17 +69,15 @@
 
 <body>
     <div class="content-wrapper center">
-        <h1>Welcome to the weekend, {{userId}}.</h1>
-        <h2>We've got some new music for you that came out in the past week.</h2>
-        <h4>This service is powered by the </h4>
-        <img class="spotify-logo" src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green-768x231.png">
-        <h4>Web API.</h4>
-
+        
+        {{#if releases}}
+        <h1>The weekend is here.</h1>
+        <h2>That means more music from the artists you love, straight to your inbox.</h2>
         <ul>
             {{#each releases}}
             <li class="release">
                 <a class="album-art" href={{this.external_urls.spotify}}>
-                    <img src={{this.images.[0].url}} />
+                    <img src={{this.images.[0].url}} alt="Album cover for {{this.name}}" />
                 </a>
                 <h3 class="album-name">{{this.name}}</h3>
                 <p class="artists">{{this.artists}}</p>
@@ -92,6 +90,16 @@
             </li>
             {{/each}}
         </ul>
+        {{else}}
+        <h2>You're followed artists didn't release any new music in the last 7 days. Follow more of your favorite artists to get more
+            music straight to your inbox, every Friday.</h2>
+        {{/if}}
+
+        <h4>This service is powered by the </h4>
+        <img class="spotify-logo"
+            src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green-768x231.png">
+        <h4>Web API.</h4>
     </div>
 </body>
+
 </html>

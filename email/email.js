@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
-const date = require('../utils/date');
 const path = require('path');
 const logger = require('../utils/logger');
 
@@ -51,15 +50,20 @@ const helpers = {
     }
 }
 
+async function handleSubject(formattedReleases, today) {
+    if (formattedReleases.length > 0) {
+        return `\u{1F6A8}New Music For You | ${today}\u{1F3A7}`
+    } else {
+        return `No New Music, Follow More Artists | ${today}`
+    }
+}
+
 async function sendEmail(userEmail, options) {
     const transporter = nodemailer.createTransport({
         pool: true,
         host: "smtp.forwardemail.net",
-        port: 465,
+        port: 2465,
         secure: true,
-        tls: {
-            rejectUnauthorized: false
-        },
         auth: {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD,
@@ -81,11 +85,12 @@ async function sendEmail(userEmail, options) {
 
     transporter.sendMail(options, (error, info) => {
         if (error) {
-            logger.error(error);
+            logger.error(`Error sending to ${userEmail}. Erroer Message: ${error}`);
         } else {
-            logger.info("Email sent to " + userEmail + ". Response: " + info.response)
+            logger.info(`Email sent to ${userEmail}. Response: ${info.response}`)
         }
     });
 }
 
 exports.sendEmail = sendEmail;
+exports.handleSubject = handleSubject;
