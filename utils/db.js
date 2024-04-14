@@ -10,8 +10,8 @@ const client = new MongoClient(mongoDbString, {
     }
 }); 
 
-const db = client.db("New-Music-Notifications");
-const collection = db.collection("UserInfo");
+const db = client.db(process.env.DATABASE_NAME);
+const collection = db.collection(process.env.DATABASE_COLLECTION_USERS);
 
 async function getUsers() {
     try {

@@ -60,8 +60,6 @@ auth.get('/callback', async function (req, res) {
             const access_token = authResponse.access_token;
             const refresh_token = authResponse.refresh_token;
 
-            res.cookie('refresh_token', refresh_token, { maxAge: 900000, httpOnly: true });
-
             const userOptions = {
                 url: 'https://api.spotify.com/v1/me',
                 method: 'GET',
@@ -112,7 +110,7 @@ auth.get('/callback', async function (req, res) {
                 res.redirect('/database-failure');
             }
 
-            res.redirect('/home');
+            res.redirect('/confirmation');
         }
     } catch (error) {
         logger.error(error);

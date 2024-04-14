@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Releases | Home</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Weekly Releases | {{metaTitle}}</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
@@ -12,29 +13,31 @@
         <nav>
             <a class="nav-links" href="/">Weekly Releases</a>
             <a class="nav-links" href="/about">About</a>
+            <a class="nav-links" href="/register">Sign me up →</a>
         </nav>
     </header>
 
-    <main class="center-main-items-text">
-        <h1>Thanks for using Weekly Releases!</h1>
-        <h2>Keep an eye out for an email from anthony@weeklyreleases.com, every Friday morning.</h2>
-        <p>To discontinue using the service, you must go into your Spotify account settings and remove authentication for this application.</p>
+    <main>
 
+        {{{body}}}
 
         <div class="footer-spacing"></div>
-        <p class="special-note">This is an early version of the site; a new site design and new features are in the works.</p>
+        <p class="special-note center-main-items-text">This is an early version of the site; a new site design and new features are in the
+            works.
+        </p>
         <div class="flex-container">
             <p>This service is powered by the</p>
             <img class="spotify-logo" src="../images/Spotify_Logo_RGB_Green.png">
             <p>Web API.</p>
         </div>
+
     </main>
 
     <footer>
         <a class="nav-links" href="/privacy-policy">Privacy Policy</a>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../script.js"></script>
 </body>
 
 </html>
