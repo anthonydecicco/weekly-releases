@@ -17,7 +17,7 @@ Spotify does address this through their Release Radar playlist, however, it only
 3. The user's information, including the access and refresh tokens, is stored in a MongoDB cluster and a confirmation email is sent. The refresh token is also stored as a cookie.
 4. The user is then redirected to the /home domain where they will see information about their account and followed artists (to be implemented); the refresh token stored as a cookie is used here to verify the user's account and show information specific to them.
 5. At this point the user is in the database. Every Friday the application will use the stored refresh token to get a new access token (expire after a certain period of time) and use it to grab the user's followed artists from the Spotify Web API.
-6. Each of the artists are then iterated over to grab their discocography. All of their songs and albums are filtered for releases in the past 7 days.
+6. Each of the artists are then iterated over to grab their discography. All of their songs and albums are filtered for releases in the past 7 days.
 7. These releases are then sent to the user's email that is associated with their Spotify account automatically on a weekly basis; users do not have to re-authenticate each time they want a refreshed list of new songs and albums.
 
 ### Languages and Technologies Used
@@ -80,6 +80,11 @@ https://www.npmjs.com/package/dotenv
 Fast, unopinionated, minimalist web framework for Node.js.
 
 https://www.npmjs.com/package/express 
+
+### express-handlebars
+A Handlebars view engine for Express which doesn't suck.
+
+https://www.npmjs.com/package/express-handlebars
 
 ### helmet
 Helmet helps secure Express apps by setting HTTP response headers.

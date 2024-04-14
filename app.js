@@ -1,16 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const cron = require('node-cron');
-const router = require('./routes/router');
+const helmet = require('helmet');
+const handlebars = require('express-handlebars')
+
 const functions = require('./utils/functions');
 const auth = require('./auth/auth');
 const authFunctions = require('./auth/auth.helper.functions');
-const cookieParser = require('cookie-parser');
 const email = require('./email/email');
 const db = require('./utils/db');
 const path = require('path');
 const date = require('./utils/date');
-const helmet = require('helmet');
 const logger = require('./utils/logger');
 
 const app = express();
@@ -18,38 +18,61 @@ const port = process.env.PORT || 8080;
 
 app.disable('x-powered-by');
 
+app.set('trust proxy', 1);
+
+const hbs = handlebars.create({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: __dirname + '/public/views/layouts/'
+})
+
+app.engine('hbs', hbs.engine)
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, './public', 'views'));
+
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use('/', router);
 app.use('/auth', auth);
 app.use(express.static('public'));
 
-//this doesn't seem to work as expected
 app.get('/', async (req, res) => {
-    const refreshTokenCookie = req.cookies.refresh_token;
-
-    if (refreshTokenCookie) {
-        const refreshToken = await db.checkForRefreshToken(refreshTokenCookie);
-
-        if (refreshToken) {
-            logger.info("Refresh token validated, proceed to Home");
-            res.sendFile(path.join(__dirname, 'public', 'home.html'));
-            //Potential for using template engine here to inject html with data based on
-            //refresh token
-        } else {
-            logger.info("Invalid token, authentication needed");
-            res.sendFile(path.join(__dirname, 'public', 'index.html'));
-            //Template engine here as well? It may help with scaling site and adding links 
-            //and content that can be conditional based on presence of a valid token 
-        }
-
-    } else {
-        logger.info("Invalid token, authentication needed");
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    }
+    return res.render('index', {
+        metaTitle: "Landing Page"
+    });
 }) 
+
+app.get('/register', async function (req, res) {
+    return res.render('register', {
+        metaTitle: "Sign Up Now"
+    });
+})
+
+app.get('/confirmation', async function (req, res) {
+    return res.render('confirmation', {
+        metaTitle: "You're In!"
+    });
+})
+
+app.get('/dashboard', async function (req, res) {
+    return res.render('dashboard', {
+        metaTitle: "Dashboard"
+    });
+});
+
+app.get('/about', async function (req, res) {
+    return res.render('about', {
+        layout: "left-align",
+        metaTitle: "Learn More"
+    });
+});
+
+app.get('/privacy-policy', async function (req, res) {
+    return res.render('privacy-policy', {
+        layout: "left-align",
+        metaTitle: "Privacy Policy"
+    });
+});
 
 async function run() {
     const users = await db.getUsers();
