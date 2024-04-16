@@ -1,8 +1,11 @@
 require('dotenv').config();
+
 const express = require('express');
 const cron = require('node-cron');
 const helmet = require('helmet');
-const handlebars = require('express-handlebars')
+const handlebars = require('express-handlebars');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const functions = require('./utils/functions');
 const auth = require('./auth/auth');
@@ -14,7 +17,7 @@ const date = require('./utils/date');
 const logger = require('./utils/logger');
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 
 app.disable('x-powered-by');
 
@@ -24,12 +27,46 @@ const hbs = handlebars.create({
     extname: '.hbs',
     defaultLayout: 'main',
     layoutsDir: __dirname + '/public/views/layouts/'
-})
+});
 
-app.engine('hbs', hbs.engine)
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, './public', 'views'));
 
+const store = new MongoDBStore({
+    uri: process.env.DATABASE_URL,
+    databaseName: process.env.DATABASE_NAME,
+    collection: process.env.DATABASE_COLLECTION_SESSIONS
+},
+    function (error) {
+        if (error) {
+            logger.error(error)
+        }
+    }
+);
+
+const second = 1000;
+const minute = second * 60;
+const hour = minute * 60;
+const day = hour * 24;
+const maxAge = day * 3;
+
+let sessionObject = {
+    cookie: { maxAge: maxAge } ,
+    name: process.env.SESSION_NAME,
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+}
+
+//if production, set cookies to secure
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1); 
+    sessionObject.cookie.secure = true; 
+}
+
+app.use(session(sessionObject));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,39 +75,56 @@ app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
     return res.render('index', {
-        metaTitle: "Landing Page"
+        metaTitle: "Landing Page",
+        isAuth: req.session.isAuth, //if isAuth = null/false, do not show certain site elements
     });
-}) 
+});
+
+app.get('/confirmation', async function (req, res) {
+    if (req.session.isAuth) {
+        return res.render('confirmation', {
+            metaTitle: "You're In!",
+            isAuth: req.session.isAuth,
+        });
+    } else {
+        res.redirect('/register');
+    }
+});
 
 app.get('/register', async function (req, res) {
     return res.render('register', {
-        metaTitle: "Sign Up Now"
+        metaTitle: "Sign Up Now",
+        isAuth: req.session.isAuth,
     });
-})
+});
 
-app.get('/confirmation', async function (req, res) {
-    return res.render('confirmation', {
-        metaTitle: "You're In!"
-    });
-})
 
+//dashboard path is work in progress
 app.get('/dashboard', async function (req, res) {
-    return res.render('dashboard', {
-        metaTitle: "Dashboard"
-    });
+    if (req.session.isAuth) {
+        return res.render('dashboard', {
+            metaTitle: "Dashboard",
+            isAuth: req.session.isAuth,
+            userId: req.session.userId
+        });
+    } else {
+        res.redirect('/register');
+    }
 });
 
 app.get('/about', async function (req, res) {
     return res.render('about', {
-        layout: "left-align",
-        metaTitle: "Learn More"
+        metaTitle: "Learn More",
+        isAuth: req.session.isAuth,
+        leftAlign: true,
     });
 });
 
 app.get('/privacy-policy', async function (req, res) {
     return res.render('privacy-policy', {
-        layout: "left-align",
-        metaTitle: "Privacy Policy"
+        metaTitle: "Privacy Policy",
+        isAuth: req.session.isAuth,
+        leftAlign: true,
     });
 });
 
@@ -133,13 +187,13 @@ scheduledRun.start();
 
 app.use((req, res, next) => {
     res.status(404).send("Sorry can't find that!")
-})
+});
 
 app.use((err, req, res, next) => {
     logger.error(err.stack)
     res.status(500).send('Something broke!')
-})
+});
 
 app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
-})
+});

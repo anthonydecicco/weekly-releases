@@ -13,18 +13,33 @@
         <nav>
             <a class="nav-links" href="/">Weekly Releases</a>
             <a class="nav-links" href="/about">About</a>
+            {{#if isAuth}}
+            <a class="nav-links" href="/dashboard">Dashboard</a>
+            {{/if}}
             <a class="nav-links" href="/register">Sign me up →</a>
         </nav>
     </header>
 
+    {{#if leftAlign}}
+    <main>
+    {{else}}
     <main class="center-main-items-text">
+    {{/if}}
 
         {{{body}}}
 
         <div class="footer-spacing"></div>
+
+        {{#if leftAlign}}
+        <p class="special-note center-main-items-text">This is an early version of the site; a new site design and new features are in the
+            works.
+        </p>
+        {{else}}
         <p class="special-note">This is an early version of the site; a new site design and new features are in the
             works.
         </p>
+        {{/if}}
+
         <div class="flex-container">
             <p>This service is powered by the</p>
             <img class="spotify-logo" src="../images/Spotify_Logo_RGB_Green.png">

@@ -110,6 +110,10 @@ auth.get('/callback', async function (req, res) {
                 res.redirect('/database-failure');
             }
 
+            //prior to successful redirect, store authentication + user info in session
+            req.session.isAuth = true;
+            req.session.userId = userInfo.userId;
+
             res.redirect('/confirmation');
         }
     } catch (error) {
