@@ -1,10 +1,14 @@
+{{#if isAuth}}
+<h1>You did it.</h1>
+<p>Thank you for authorizing this application through your Spotify account! New music will be in your inbox next Friday.</p>
+<p>Check out your <a href="/dashboard">dashboard</a> to see who you follow.</p>
+{{else}}
 <h1>Welcome to Weekly Releases.</h1>
-<h2>This application will send you weekly emails on Fridays with new releases from your followed artists on Spotify.
-</h2>
-<p>Click the button below to authenticate with your Spotify account (you will be redirected
+<p>Click the button below to authorize this application through your Spotify account (you will be redirected
     temporarily).</p>
 
-<button id="auth-button">Authenticate</button>
-<p>By clicking "Authenticate," you agree to share your email and Spotify user information. Your information is only
+<button id="auth-button">Authorize</button>
+<p>By clicking "Authorize," you agree to share your email and Spotify user information. Your information is only
     used to interface with the Spotify Web API and send you emails with the latest songs and albuns from your
     followed artists. More information about this can be found on the <a href="/about">About</a> page.</p>
+{{/if}}

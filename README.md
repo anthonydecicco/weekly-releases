@@ -66,10 +66,10 @@ The MongoDB documentation provides information and knowledge needed to build app
 https://www.mongodb.com/docs/ 
 
 ## Dependencies
-### cookie-parser
-Parse Cookie header and populate req.cookies with an object keyed by the cookie names. Optionally you may enable signed cookie support by passing a secret string, which assigns req.secret so it may be used by other middleware.
+### connect-mongodb-session
+MongoDB-backed session storage for connect and Express. Meant to be a well-maintained and fully-featured replacement for modules like connect-mongo
 
-https://www.npmjs.com/package/cookie-parser 
+https://www.npmjs.com/package/connect-mongodb-session
 
 ### dotenv
 Dotenv is a zero-dependency module that loads environment variables from a .env file into process.env. Storing configuration in the environment separate from code is based on The Twelve-Factor App methodology.
@@ -85,6 +85,11 @@ https://www.npmjs.com/package/express
 A Handlebars view engine for Express which doesn't suck.
 
 https://www.npmjs.com/package/express-handlebars
+
+### express-session
+Express-session creates a session middleware that can connect to stores to store session cookies server-side.
+
+https://www.npmjs.com/package/express-session 
 
 ### helmet
 Helmet helps secure Express apps by setting HTTP response headers.
