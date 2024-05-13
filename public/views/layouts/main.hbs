@@ -4,55 +4,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weekly Releases | {{metaTitle}}</title>
+    <title>{{metaTitle}}</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="./images/favicon/site.webmanifest">
     <link rel="stylesheet" href="./styles.css">
-</head>
+    </head>
 
 <body>
     <header>
         <nav>
-            <a class="nav-links" href="/">Weekly Releases</a>
-            <a class="nav-links" href="/about">About</a>
-            {{#if isAuth}}
-            <a class="nav-links" href="/dashboard">Dashboard</a>
-            {{/if}}
-            <a class="nav-links" href="/register">Sign me up →</a>
+            <a class="nav-links a-link-after-none" href="/">
+                <div class="logo-container">
+                    <div class="logo">
+                        <img class="logo-img" src="..\images\Union.png" />
+                        <img class="logo-words" src="..\images\weekly_releases.png" />
+                    </div>
+                </div>
+            </a>
+            <div class="nav-group-right">
+                <a class="nav-links" href="/about">About</a>
+                {{#if isAuth}}
+                <a class="nav-links" href="/dashboard">Dashboard</a>
+                {{/if}}
+                <a class="nav-links" href="/register">Sign me up →</a>
+            </div>
+            <div class="hamburger-container">
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+                <div class="hamburger"></div>
+            </div>
+            <div class="hamburger-menu display-none">
+                <a class="nav-links hamburger-link" href="/">Home</a>
+                <a class="nav-links hamburger-link" href="/about">About</a>
+                {{#if isAuth}}
+                <a class="nav-links hamburger-link" href="/dashboard">Dashboard</a>
+                {{/if}}
+                <a class="nav-links hamburger-link" href="/register">Sign me up →</a>
+            </div>
         </nav>
     </header>
 
     {{#if leftAlign}}
     <main>
-    {{else}}
-    <main class="center-main-items-text">
-    {{/if}}
-
-        {{{body}}}
-
-        <div class="footer-spacing"></div>
-
-        {{#if leftAlign}}
-        <p class="special-note center-main-items-text">This is an early version of the site; a new site design and new features are in the
-            works.
-        </p>
         {{else}}
-        <p class="special-note">This is an early version of the site; a new site design and new features are in the
-            works.
-        </p>
-        {{/if}}
+        <main class="center-main-items-text">
+            {{/if}}
 
-        <div class="flex-container">
-            <p>This service is powered by the</p>
-            <img class="spotify-logo" src="../images/Spotify_Logo_RGB_Green.png">
-            <p>Web API.</p>
-        </div>
+            {{{body}}}
 
-    </main>
+            <div class="footer-spacing"></div>
+        </main>
 
-    <footer>
-        <a class="nav-links" href="/privacy-policy">Privacy Policy</a>
-    </footer>
 
-    <script src="../script.js"></script>
+        <footer class="flex-end">
+            <a class="nav-links" href="/privacy-policy">Privacy Policy</a>
+        </footer>
+
+        <script src="../script.js"></script>
 </body>
 
 </html>

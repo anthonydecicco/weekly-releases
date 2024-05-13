@@ -9,9 +9,14 @@ const logger = require('../utils/logger');
 const util = require('util');
 const randomBytesAsync = util.promisify(crypto.randomBytes);
 
+const app = express();
+
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-const baseUrl = process.env.BASE_URL || 'http://localhost:8080/';
+let baseUrl = process.env.BASE_URL;
+if (app.get('env') !== 'production') {
+    baseUrl = 'http://localhost:10000/';
+}
 const redirect_uri = baseUrl + "auth/callback";
 
 function generateRandomString(length) {  
@@ -114,7 +119,7 @@ auth.get('/callback', async function (req, res) {
             req.session.isAuth = true;
             req.session.userId = userInfo.userId;
 
-            res.redirect('/confirmation');
+            res.redirect('/register');
         }
     } catch (error) {
         logger.error(error);

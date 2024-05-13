@@ -12,8 +12,6 @@
 
         .content-wrapper {
             margin: 0 auto;
-            border: 1px solid rgb(177, 177, 177);
-            border-radius: 12px;
             width: 90%;
             padding: 20px;
             font-family: 'Segoe UI', sans-serif;
@@ -57,13 +55,6 @@
             margin-bottom: 30px;
         }
 
-        ul {
-            padding: 0;
-            margin: 20px auto;
-            width: fit-content;
-            text-align: center;
-            list-style-type: none;
-        }
     </style>
 </head>
 
@@ -73,9 +64,9 @@
         {{#if releases}}
         <h1>The weekend is here.</h1>
         <h2>That means more music from the artists you love, straight to your inbox.</h2>
-        <ul>
+
             {{#each releases}}
-            <li class="release">
+            <div class="release">
                 <a class="album-art" href={{this.external_urls.spotify}}>
                     <img src={{this.images.[0].url}} alt="Album cover for {{this.name}}" />
                 </a>
@@ -87,9 +78,9 @@
                 <p class="tracks">{{this.total_tracks}} track</p>
                 {{/if}}
                 <p class="release-date">{{this.release_date}}</p>
-            </li>
+            </div>
             {{/each}}
-        </ul>
+
         {{else}}
         <h2>You're followed artists didn't release any new music in the last 7 days. Follow more of your favorite artists to get more
             music straight to your inbox, every Friday.</h2>

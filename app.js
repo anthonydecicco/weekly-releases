@@ -15,6 +15,7 @@ const db = require('./utils/db');
 const path = require('path');
 const date = require('./utils/date');
 const logger = require('./utils/logger');
+const test = require('./testing/test');
 
 const app = express();
 const port = process.env.PORT;
@@ -75,25 +76,21 @@ app.use(express.static('public'));
 
 app.get('/', async (req, res) => {
     return res.render('index', {
-        metaTitle: "Landing Page",
+        metaTitle: "New Music Every Friday",
         isAuth: req.session.isAuth, //if isAuth = null/false, do not show certain site elements
+        leftAlign: true
     });
 });
 
-app.get('/confirmation', async function (req, res) {
-    if (req.session.isAuth) {
-        return res.render('confirmation', {
-            metaTitle: "You're In!",
-            isAuth: req.session.isAuth,
-        });
-    } else {
-        res.redirect('/register');
-    }
-});
-
 app.get('/register', async function (req, res) {
+    let metaTitle = "Sign Me Up →";
+
+    if (req.session.isAuth) {
+        metaTitle = "You're In."
+    }
+    
     return res.render('register', {
-        metaTitle: "Sign Up Now",
+        metaTitle: metaTitle,
         isAuth: req.session.isAuth,
     });
 });
@@ -127,6 +124,21 @@ app.get('/privacy-policy', async function (req, res) {
         leftAlign: true,
     });
 });
+
+//create an accessible route for easy testing of email templates
+if (app.get('env') !== 'production') {
+    app.get('/test', async function (req, res) {
+        return res.render('test', {
+            metaTitle: "Test",
+            isAuth: req.session.isAuth,
+        })
+    })
+
+    app.get('/sendemail', async function (req, res) {
+        test.sendTest();
+        return res.redirect('/test');
+    })
+}
 
 async function run() {
     const users = await db.getUsers();
