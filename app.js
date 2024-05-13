@@ -15,7 +15,6 @@ const db = require('./utils/db');
 const path = require('path');
 const date = require('./utils/date');
 const logger = require('./utils/logger');
-const test = require('./testing/test');
 
 const app = express();
 const port = process.env.PORT;
@@ -127,6 +126,7 @@ app.get('/privacy-policy', async function (req, res) {
 
 //create an accessible route for easy testing of email templates
 if (app.get('env') !== 'production') {
+    const test = require('./testing/test');
     app.get('/test', async function (req, res) {
         return res.render('test', {
             metaTitle: "Test",
