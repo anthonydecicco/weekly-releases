@@ -2,7 +2,7 @@
 const dashMain = document.querySelector(".dash-main");
 const loadingIndicator = document.querySelector(".loading-indicator");
 
-const baseUrl = "https://weeklyreleases.com/";
+const baseUrl = "https://www.weeklyreleases.com/";
 // const baseUrl = "http://localhost:10000/";
 
 const recommendedRoute = "api/recommendedartists";
