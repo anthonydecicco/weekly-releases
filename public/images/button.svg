@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="109.768 211.65 264.114 48" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" clip-rule="evenodd" d="M 373.882 211.65 C 360.627 211.65 349.882 222.395 349.882 235.65 C 349.882 248.904 360.627 259.65 373.882 259.65 L 373.882 211.65 Z" style="fill: rgb(255, 255, 255);"/>
   <rect width="214" height="48" rx="24" x="134.825" y="211.65" style="fill: rgb(255, 255, 255);"/>
-  <path fill-rule="evenodd" clip-rule="evenodd" d="M 133.768 211.65 C 120.513 211.65 109.768 222.395 109.768 235.65 C 109.768 248.904 120.513 259.65 133.768 259.65 L 133.768 211.65 Z" style="fill: rgb(255, 255, 255);"/>
 </svg>

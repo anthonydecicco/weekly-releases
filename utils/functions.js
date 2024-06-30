@@ -93,6 +93,63 @@ async function getFollowedArtists(user) {
     return followedArtists;
 }
 
+async function getNextPageOfRecommendedArtists(url, method, headers, followedArtists) {
+    if (url !== null) {
+        const errorMessage = 'unable to get the next page of followed artists'
+
+        const additionalArtists = await handleRequest(
+            url,
+            method,
+            headers,
+            null,
+            errorMessage);
+        
+        followedArtists.push(...additionalArtists.items);
+
+        if (additionalArtists.next !== null) {
+            await getNextPageOfRecommendedArtists(
+                additionalArtists.next,
+                method,
+                headers,
+                followedArtists
+            ) //each subsequent call should be awaited
+
+        } else {
+            return;
+        }
+    } else return;
+}
+
+async function getRecommendedArtists(user) {
+    const access_token = user.userTempAccessToken;
+
+    const recommendedArtistsOptions = {
+        url: 'https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50',
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        errorMessage: 'unable to get initial request for followed artists'
+    };
+
+    const data = await handleRequest(
+        recommendedArtistsOptions.url,
+        recommendedArtistsOptions.method,
+        recommendedArtistsOptions.headers,
+        null,
+        recommendedArtistsOptions.errorMessage,
+    );
+
+    let recommendedArtists = data.items;
+
+    await getNextPageOfRecommendedArtists(
+        data.next,
+        recommendedArtistsOptions.method,
+        recommendedArtistsOptions.headers,
+        recommendedArtists
+    );  
+
+    return recommendedArtists;
+}
+
 async function getNextPageOfReleases(url, method, headers, releases) {
     if (url !== null) {
         const errorMessage = 'unable to get next page of releases from followed artist'
@@ -202,9 +259,12 @@ async function formatReleases(releases) {
     return releases;
 }
 
-exports.handleRequest = handleRequest;
-exports.getFollowedArtists = getFollowedArtists;
-exports.getReleasesByArtist = getReleasesByArtist;
-exports.sortReleasesByMostRecent = sortReleasesByMostRecent;
-exports.filterReleases = filterReleases;
-exports.formatReleases = formatReleases;
+module.exports = {
+    handleRequest,
+    getFollowedArtists,
+    getRecommendedArtists,
+    getReleasesByArtist,
+    sortReleasesByMostRecent,
+    filterReleases,
+    formatReleases,
+}

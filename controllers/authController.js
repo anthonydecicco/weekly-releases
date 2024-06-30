@@ -1,8 +1,7 @@
 const express = require('express');
-const auth = express.Router();
 const crypto = require('crypto');
 const db = require('../utils/db');
-const email = require('../email/email');
+const email = require('../utils/email');
 const date = require('../utils/date');
 const functions = require('../utils/functions');
 const logger = require('../utils/logger');
@@ -23,15 +22,15 @@ function generateRandomString(length) {
     return randomBytesAsync(60).toString('hex').slice(0, length);
 }
 
-auth.get('/login', async function (req, res) {
+async function loginLogic(req, res) {
     const state = generateRandomString(16);
-    const scope = 'user-read-private user-read-email user-follow-read user-follow-modify';
+    const scope = 'user-read-private user-read-email user-follow-read user-follow-modify'; //user-top-read once approved
     
     const queryParams = `response_type=code&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=${state}`
     res.redirect(`https://accounts.spotify.com/authorize?${queryParams}`);
-})
+}
 
-auth.get('/callback', async function (req, res) {
+async function callbackLogic(req, res) {
     try {
         const code = req.query.code || null;
         const state = req.query.state || null;
@@ -83,8 +82,12 @@ auth.get('/callback', async function (req, res) {
             const userInfo = {
                 userId: userDetailResponse.id,
                 userEmail: userDetailResponse.email,
+                userPreferredEmail: userDetailResponse.userPreferredEmail,
+                userDisplayName: userDetailResponse.display_name,
+                userImage: userDetailResponse.images[1],
+                userUrl: userDetailResponse.external_urls.spotify,
                 userTempAccessToken: access_token,
-                userRefreshToken: refresh_token
+                userRefreshToken: refresh_token,
             }
             
             //create requiresConfirmation and redirectCheck variables
@@ -107,7 +110,7 @@ auth.get('/callback', async function (req, res) {
                     }
                 }
 
-                await email.sendEmail(userInfo.userEmail, confirmationOptions);
+                await email.sendEmail(confirmationOptions);
             }
 
             //if the addOrUpdateUserInfo function failed, redirect
@@ -118,6 +121,11 @@ auth.get('/callback', async function (req, res) {
             //prior to successful redirect, store authentication + user info in session
             req.session.isAuth = true;
             req.session.userId = userInfo.userId;
+            req.session.userEmail = userInfo.userEmail;
+            req.session.userDisplayName = userInfo.userDisplayName;
+            req.session.userImage = userInfo.userImage;
+            req.session.userUrl = userInfo.userUrl;
+            req.session.userPreferredEmail = userInfo.userPreferredEmail;
 
             res.redirect('/register');
         }
@@ -125,9 +133,9 @@ auth.get('/callback', async function (req, res) {
         logger.error(error);
         res.redirect('/spotify-callback-failure');
     }
-})
+}
 
-auth.post('/refresh_token', async function (req, res) {
+async function refreshTokenLogic(req, res) {
     try {
         const refresh_token = req.body.refresh_token; 
 
@@ -158,6 +166,10 @@ auth.post('/refresh_token', async function (req, res) {
     } catch (error) {
         logger.error(error);
     }
-});
+}
 
-module.exports = auth;
+module.exports = {
+    loginLogic,
+    callbackLogic,
+    refreshTokenLogic,
+};

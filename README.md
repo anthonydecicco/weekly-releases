@@ -24,6 +24,7 @@ Spotify does address this through their Release Radar playlist, however, it only
 - JavaScript
 - HTML
 - CSS
+- handlebars.js
 - Node.js
 - Express.js
 - MongoDB

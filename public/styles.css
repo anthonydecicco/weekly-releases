@@ -18,15 +18,16 @@
 html, body {
     height: 100%;
     width: 100%;
+    box-sizing: border-box;
 }
 
 body {
-    box-sizing: border-box;
     padding: 0px;
     margin: 0px;
     color: white;
     /* background-color: rgb(39, 34, 29); */
-    background-color: rgb(40, 33, 39);
+    /* background-color: rgb(40, 33, 39); */
+    background-color: rgb(14, 13, 14);
     font-family: 'Manrope';
     font-weight: lighter;
 }
@@ -45,6 +46,7 @@ main {
     padding: 0 24px 0 24px;
     flex-grow: 1;
     flex-shrink: 0;
+    max-width: 100%;
 } 
 
 header, footer {
@@ -53,6 +55,7 @@ header, footer {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    font-size: 18px;
 }
 
 .footer-spacing {
@@ -87,7 +90,7 @@ nav {
 
 .nav-group-right {
     height: 100%;
-    display: flex;
+    display: none;
     text-align: center;
     align-items: center;
 }
@@ -100,6 +103,7 @@ nav {
     font-family: "IBMPlexMono";
     text-transform: uppercase;
     text-decoration: none;
+    font-weight: normal;
 }
 
 a {
@@ -108,9 +112,10 @@ a {
     width: fit-content;
     display: inline-block;
     position: relative;
+    font-weight: bold;
 }
 
-a::after {
+.nav-links::after {
     content: "";
     background: white;
     mix-blend-mode: exclusion;
@@ -123,20 +128,12 @@ a::after {
     text-decoration: none;
 }
 
-a:hover::after {
+.nav-links:hover::after {
     height: calc(100% + 6px);
 }
 
 .a-link-after-none::after {
     content: none;
-}
-
-main > p > a, main > ul > li > p > a {
-    font-weight: bold;
-}
-
-main > p > a:hover, main > ul > li > p > a:hover {
-    text-decoration: none;
 }
 
 .hamburger-container {
@@ -147,6 +144,7 @@ main > p > a:hover, main > ul > li > p > a:hover {
     width: fit-content;
     padding: 2px;
     z-index: 3;
+    margin-right: 24px;
 }
 
 .hamburger-container:hover {
@@ -187,14 +185,34 @@ main > p > a:hover, main > ul > li > p > a:hover {
 
 /* utilities */
 
+input {
+    all: unset;
+}
+
+input:focus {
+    caret-color: white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #d8d8d8;
+  -webkit-box-shadow: 0 0 0px 40rem #000000 inset;
+}
+
+
 button {
-    background-color: unset;
-    border: unset;
-    padding: 0;
-    position: relative;
-    width: 15rem;
-    height: 3rem;
+    all: unset;
     font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9rem;
+    background-color: white;
+    color: black;
+    border-radius: 17px;
+    padding: 10px 20px 10px 20px;
+    height: fit-content;
+    min-width: fit-content;
     transition: all .4s ease;
 }
 
@@ -207,21 +225,6 @@ button:hover {
 button:active {
     filter: invert(1);
     transform: translate(0, 5%);
-}
-
-.buttom-bg-img {
-    height: auto;
-    width: 100%;
-}
-
-.button-text {
-    z-index: 1;
-    margin: 0;
-    padding: 0;
-    font-size: .8rem;
-    padding-bottom: .4rem;
-    text-transform: uppercase;
-    font-weight: bold;
 }
 
 .img-container {
@@ -258,6 +261,20 @@ button:active {
     filter: invert(1);
 }
 
+.loading-indicator {
+    height: 100%;
+    width: 100%;
+    font-size: 40px;
+    text-align: center;
+}
+
+.no-artists-indicator {
+    height: 100%;
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+}
+
 
 
 /* Spotify Logo */
@@ -288,11 +305,11 @@ button:active {
 }
 
 .logo-img {
-    height: 50%;
     width: auto;
     margin-right: 10px;
     filter: brightness(0) saturate(100%) invert(39%) sepia(74%) saturate(705%) hue-rotate(270deg) brightness(98%) contrast(78%);
     /* d156aa */
+    height: 50%;
 }
 
 .logo-words {
@@ -305,22 +322,24 @@ button:active {
 
 /* index */
 
+.index-h1, .index-sign-up {
+    font-size: 36px;
+}
+
 .index-h1 {
     font-weight: normal;   
-    font-size: 44px; 
     margin-bottom: 15px;
 }
 
 .index-message {
     max-width: 100%;
     margin-top: 0;
-    margin-right: 35%;
-    font-size: 40px;
+    font-size: 28px;
+    margin-right: 0;
 }
 
 .index-sign-up {
     font-weight: bolder;
-    font-size: 44px;
     margin-bottom: 24px;
 }
 
@@ -337,7 +356,7 @@ button:active {
     background-image: url(./images/index-gradient-bg.png);
     background-size: cover;
     top: 0;
-    height: 100%;
+    height: 100vh;
     min-width: 100%;
     overflow: hidden;
     z-index: -1;
@@ -347,43 +366,199 @@ button:active {
 .bg-img-right {
     position: absolute;
     top: 0;
-    left: 50%;
-    width: 100%;
+    width: 100vh;
     min-height: 100%;
     mix-blend-mode: exclusion;
     object-fit: cover;
-    opacity: 30%;
+    opacity: 15%;
     z-index: -1;
+    left: 0;
 }
 
 
 
+/* Dashboard Layout */
+
+.dash-container {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.dash-sidebar {
+    min-width: fit-content;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.user-info-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: #231f21;
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+#user-display-name, #user-email, #user-id {
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+#user-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.sidebar-nav {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
+    font-size: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar-nav-button {
+    display: flex;
+    margin-top: 20px;
+    justify-content: center;
+    margin-left: 10px;
+    margin-right: 10px;
+    min-width: fit-content;
+    align-items: center;
+    font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.sidebar-nav-button:hover {
+    cursor: pointer;
+}
+
+.sidebar-nav-button-current {
+    background-color: white;
+    color: black;
+}
+
+.dash-main {
+    padding-top: 1px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.card {
+    text-align: center;
+    margin: 0 3px 50px 3px;
+    vertical-align: top;
+    width: 275px;
+    height: 300px;
+    padding-bottom: 15px;
+    /* background-color: #110f10; */
+    background-color: #231f21;
+    border-radius: 10px;
+    transition: ease-in-out;
+    transition-duration: 0.2s;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card-img-container {
+    width: 100%;
+    height: 250px;
+    margin-bottom: 2px;
+    object-fit: contain;
+    overflow: hidden;
+    /* border-radius: 10px; */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.settings-section {
+    height: fit-content;
+    width: 100%;
+    border-top: 1px solid white;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.settings-section:last-child {
+    border-bottom: 1px solid white;
+}
+
+.settings-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.settings-input {
+    width: 90%;
+    margin-left: 2px;
+    margin-right: 2px;
+    height: fit-content;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.input-button-container {
+    display: block;
+}
+
+
 /* Media queries */
 
-@media screen and (min-width: 0px) {
-    .bg-img-right {
-        left: 0;
-        opacity: 30%;
+@media screen and (min-width: 390px) {
+    .index-h1, .index-sign-up {
+        font-size: 39px;
     }
-
     .index-message {
-        margin-right: 0;
+        font-size: 33px;
     }
-
-    header, footer {
-        font-size: 18px;
+    #user-image {
+        height: 90px;
+        width: 90px;
+        margin-left: 10px;
+        margin-bottom: 5px;
     }
-
-    .logo-img {
-        height: 60%;
+    .user-info-container {
+        margin-left: 10px;
     }
+}
 
-    .hamburger-container {
-        margin-right: 24px;
-    }
-
-    .nav-group-right {
-        display: none;
+@media screen and (min-width: 490px) {
+    .user-info-container {
+        font-size: 1rem;
     }
 }
 
@@ -398,8 +573,11 @@ button:active {
     .index-message {
         margin-right: 15%;
     }
-    .landing-sign-up {
-        margin-bottom: 0;
+    .index-h1, .index-sign-up {
+        font-size: 44px;
+    }
+    .index-message {
+        font-size: 40px;
     }
     .logo-words{
         display: block;
@@ -407,23 +585,72 @@ button:active {
     header, footer {
         font-size: 20px;
     }
-    .logo-img {
-        height: 70%;
-    }
     main {
         padding: 0 48px 0 48px;
     }
     .logo {
         margin-left: 48px;
     }
+    #user-image {
+        margin-left: 10px;
+    }
+    .user-info-container {
+        margin-left: 20px;
+    }
+    .sidebar-nav {
+        font-size: 24px;
+        align-items: flex-start;
+    }
+    .input-button-container {
+        display: flex;
+        align-items: center;
+    }
+    .settings-input {
+        max-width: 60%;
+        margin-right: 15px;
+    }
 }
 
 @media screen and (min-width: 900px) {
-    .hamburger-container {
-        display: none;
+    .dash-container {
+        min-height: 100%;
+        width: 100%;
+        flex-wrap: nowrap;
+        flex-direction: unset;
+    }
+    .dash-sidebar {
+        top: 3rem;
+        position: sticky;
+        align-self: start;
+        flex-direction: column;
+        margin-right: 25px;
+    }
+    .user-info-card {
+        flex-direction: column;
+        align-items: unset;
+    }
+    .user-info-container {
+        margin-left: 10px;
+    }
+    .sidebar-nav {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    .sidebar-nav-button {
+        margin-left: 5px;
+    }
+    #user-image {
+        width: 150px;
+        height: 150px;
     }
     .nav-group-right {
         display: flex;
+    }
+    .hamburger-container {
+        display: none;
+    }
+    .settings-section {
+        margin-left: 40px;
     }
 }
 
@@ -431,7 +658,7 @@ button:active {
     .index-message {
         margin-right: 30%;
     }
-    .logo-img {
-        height: 50%;
+    .hamburger-container {
+        display: none;
     }
 }

@@ -1,0 +1,29 @@
+<section class="settings-section">
+    <h2 class="settings-title">Email Preferences</h2>
+    {{!-- <form id="email-form" action="http://localhost:10000/api/updateemail" method="POST"> --}}
+    <form id="email-form" action="https://weeklyreleases.com/api/updateemail" method="POST">
+        <label for="preferred-email">Change your preferred email.</label>
+        {{#if userPreferredEmail}}
+            <p style="margin-bottom: 0;">Your preferred email is currently set to: {{userPreferredEmail}}</p>
+        {{else}}
+            <p style="margin-bottom: 0;">You do not have a preferred email. New releases are currently being sent to: {{userEmail}}</p>
+        {{/if}}
+        <div class="input-button-container">
+            <input class="settings-input" id="preferred-email" name="preferred-email" type="email" required>
+            <button type="submit" id="auth-button">Update Email</button>
+        </div>
+    </form>
+</section>
+
+<section class="settings-section">
+    <h2 class="settings-title">Manage Your Data</h2>
+    {{!-- <form id="data-form" action="http://localhost:10000/api/deletedata" method="POST"> --}}
+    <form id="data-form" action="https://weeklyreleases.com/api/deletedata" method="POST">
+        <label for="delete-email">Type the email associated with your Spotify account to remove your information from our database and to discontinue service (you can sign up again at any point).</label>
+        <p style="margin-bottom: 0;"> NOTE: You will be redirected to the home page after deleting your data. To fully remove app authorization, remove "New Music Notifications" from your Spotify account settings by following the instructions in this <a target="_blank" href="https://support.spotify.com/us/article/spotify-on-other-apps/">Spotify article</a>.</p>
+        <div class="input-button-container">
+            <input class="settings-input" id="delete-email" name="delete-email" required>
+            <button type="submit" id="auth-button">Delete Your Data</button>
+        </div>
+    </form>
+</section>
