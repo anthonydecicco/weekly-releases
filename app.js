@@ -58,6 +58,12 @@ if (app.get('env') !== 'production') {
     app.use('/test', testRouter);
 }
 
+app.use(function (req, res, next) {
+    res.status(404);
+    res.json("Status: 404, Page not found");
+    next();
+});
+
 // getWeeklyReleases().catch((error) => {
 //     logger.error(error);
 // });
