@@ -1,14 +1,19 @@
-{{#if isAuth}}
-<h1>You're in.</h1>
-<p>Keep an eye out for an email every Friday morning with your artists' newest releases.</p>
-<p>Please note that our emails sometimes end up in spam or junk folders. Make sure to whitelist anthony@weeklyreleases.com to make sure you never miss out on new music.</p>
-<p>Check out your <a href="/dashboard/followed">dashboard</a> to see who you follow.</p>
-{{else}}
-<h1>Want to know when your favorite artists release new music?</h1>
-<p>Click the button below to authorize this application through your Spotify account (you will be redirected
-    temporarily).</p>
-<button id="auth-button">Authorize on Spotify</button>
-<p>By clicking "AUTHORIZE ON SPOTIFY," you agree to share your email and Spotify user information. Your information is only
-    used to interface with the Spotify Web API and send you emails with the latest songs and albums from your
-    followed artists. More information about this can be found on the <a href="/about">About</a> page.</p>
-{{/if}}
+<div class="bg-img-container opacity-20">
+    <img class="bg-img-full opacity-60" src="..\images\rave-bg.jpg">
+</div>
+
+<section class="single-column-section flex-column center-main-items-text">
+    {{#if isAuth}}
+    <h2 class="section-emphasis">You're in.</h2>
+    <p>Keep an eye out for an email every Friday morning with your artists' newest releases.</p>
+    <p>Our emails sometimes end up in spam or junk folders. Make sure to whitelist
+        <a>anthony@weeklyreleases.com</a> to make sure you never miss out on new music.</p>
+    <p>Check out your <a href="/dashboard/followed">dashboard</a>.</p>
+    {{else}}
+    <h2 class="section-emphasis">Want to know when your favorite artists release new music?</h2>
+    <p>Click the button below to authorize this application through your Spotify account (you will be redirected
+        temporarily).</p>
+    <button id="auth-button">Authorize on Spotify</button>
+    <p>More information about what authorization means can be found on the <a href="/about">About</a> page.</p>
+    {{/if}}
+</section>

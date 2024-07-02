@@ -14,7 +14,8 @@ async function registerLogic(req, res) {
     return res.render('register', {
         metaTitle: "Sign Me Up →",
         isAuth: req.session.isAuth,
-        additionalScript: "register.js"
+        leftAlign: true,
+        additionalScript: "register.js",
     });
 }
 
