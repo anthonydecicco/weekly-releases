@@ -28,12 +28,12 @@ async function getWeeklyReleases() {
         const today = await date.getTodayDateString(now);
         const subject = await email.handleSubject(formattedReleases, today);
 
-        let email;
+        let recipientEmail;
 
         if (user.userPreferredEmail === null || user.userPreferredEmail === undefined) {
-            email = user.userEmail;
+            recipientEmail = user.userEmail;
         } else {
-            email = user.userPreferredEmail;
+            recipientEmail = user.userPreferredEmail;
         }
 
         const releasesOptions = {
@@ -41,7 +41,7 @@ async function getWeeklyReleases() {
                 name: 'Weekly Releases',
                 address: process.env.EMAIL_USERNAME,
             },
-            to: email,
+            to: recipientEmail,
             subject: subject,
             template: 'releases',
             context: {
@@ -50,7 +50,7 @@ async function getWeeklyReleases() {
             }
         }
 
-        logger.info(`${email} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`)
+        logger.info(`${recipientEmail} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`)
         await email.sendEmail(releasesOptions);
     }
 } 
