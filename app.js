@@ -68,8 +68,8 @@ app.use(function (req, res, next) {
 //     logger.error(error);
 // });
 
-//fetch weekly releases every Friday at 8am, Central Standard Time
-const scheduledRun = cron.schedule('0 9 * * Fri', () => {
+//fetch weekly releases every Friday at 7am, Central Standard Time
+const scheduledRun = cron.schedule('0 7 * * Fri', () => {
     logger.info("Starting the 8am request for new releases...\n")
 
     getWeeklyReleases().catch((error) => {
