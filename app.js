@@ -70,12 +70,13 @@ app.use(function (req, res, next) {
 
 //fetch weekly releases every Friday at 7am, Central Standard Time
 const scheduledRun = cron.schedule('0 7 * * Fri', () => {
-    logger.info("Starting the 8am request for new releases...\n")
+    logger.info("Starting the 7am request for new releases...\n")
 
     getWeeklyReleases().catch((error) => {
         logger.error(error);
     });
-    
+
+    logger.info("Finished getting new releases.");
 }, {
     scheduled: true,
     timezone: "US/Central"

@@ -60,29 +60,36 @@
 
 <body>
     <div class="content-wrapper center">
-        
+
         {{#if releases}}
-        <h1>The weekend is here.</h1>
+        <h1>It's Friday.</h1>
         <h2>That means more music from the artists you love, straight to your inbox.</h2>
 
-            {{#each releases}}
-            <div class="release">
-                <a class="album-art" href={{this.external_urls.spotify}}>
-                    <img src={{this.images.[0].url}} alt="Album cover for {{this.name}}" />
-                </a>
-                <h3 class="album-name">{{this.name}}</h3>
-                <p class="artists">{{this.artists}}</p>
-                {{#if (compare this.total_tracks '>' 1)}}
-                <p class="tracks">{{this.total_tracks}} tracks</p>
-                {{else}}
-                <p class="tracks">{{this.total_tracks}} track</p>
-                {{/if}}
-                <p class="release-date">{{this.release_date}}</p>
-            </div>
-            {{/each}}
+        <p>Sorry to those that did not receive new music in their inbox last week. I deployed a product update that broke some code.
+            I was also celebrating the independence of our nation and was not able to roll out a robust solution. To
+            make up for it, this week's edition compiles the last 14 days of releases. Enjoy.</p>
+
+        <br>
+
+        {{#each releases}}
+        <div class="release">
+            <a class="album-art" href={{this.external_urls.spotify}}>
+                <img src={{this.images.[0].url}} alt="Album cover for {{this.name}}" />
+            </a>
+            <h3 class="album-name">{{this.name}}</h3>
+            <p class="artists">{{this.artists}}</p>
+            {{#if (compare this.total_tracks '>' 1)}}
+            <p class="tracks">{{this.total_tracks}} tracks</p>
+            {{else}}
+            <p class="tracks">{{this.total_tracks}} track</p>
+            {{/if}}
+            <p class="release-date">{{this.release_date}}</p>
+        </div>
+        {{/each}}
 
         {{else}}
-        <h2>You're followed artists didn't release any new music in the last 7 days. Follow more of your favorite artists to get more
+        <h2>You're followed artists didn't release any new music in the last 7 days. Follow more of your favorite
+            artists to get more
             music straight to your inbox, every Friday.</h2>
         {{/if}}
 

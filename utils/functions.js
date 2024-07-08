@@ -23,9 +23,14 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
             const retryAfterMs = parseInt(retryAfter) * 1000;
             await new Promise(resolve => setTimeout(resolve, retryAfterMs));
+            //wait the amount of time in retry-after header
+
+            return await handleRequest(url, method, headers, body, errorMessage);
+            //retry the request
 
         } else {
-            logger.error(response.status + response.body);
+            const errorText = await response.text();
+            logger.error(response.status + ": " + errorText);
         }
     } catch (error) {
         if (errorMessage !== null) {
@@ -34,6 +39,8 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
             logger.error("Error handling request: ", error)
         }
     }
+
+    return null;
 }
 
 async function getNextPageOfArtists(url, method, headers, followedArtists) {
@@ -55,7 +62,7 @@ async function getNextPageOfArtists(url, method, headers, followedArtists) {
                 method,
                 headers,
                 followedArtists
-            ) //each subsequent call should be awaited
+            ); //each subsequent call should be awaited
 
         } else {
             return;
@@ -81,21 +88,29 @@ async function getFollowedArtists(user) {
         followedArtistsOptions.errorMessage,
     );
 
-    let followedArtists = data.artists.items;
+    if (data && data.artists && data.artists.items) {
+        let followedArtists = data.artists.items;
+        //if successful API call, and the format is as expected
 
-    await getNextPageOfArtists(
-        data.artists.next,
-        followedArtistsOptions.method,
-        followedArtistsOptions.headers,
-        followedArtists
-    );
+        await getNextPageOfArtists(
+            data.artists.next,
+            followedArtistsOptions.method,
+            followedArtistsOptions.headers,
+            followedArtists
+        );
 
-    return followedArtists;
+        return followedArtists;
+    } else {
+        logger.error("Unable to retrieve followed artists or response is null");
+        return [];
+        //return an empty array if unable to retrieve followed artists
+        //this keeps the for loop in weeklyReleases.js cycling
+    }
 }
 
 async function getNextPageOfRecommendedArtists(url, method, headers, followedArtists) {
     if (url !== null) {
-        const errorMessage = 'unable to get the next page of followed artists'
+        const errorMessage = 'Unable to get the next page of followed artists'
 
         const additionalArtists = await handleRequest(
             url,
@@ -112,7 +127,7 @@ async function getNextPageOfRecommendedArtists(url, method, headers, followedArt
                 method,
                 headers,
                 followedArtists
-            ) //each subsequent call should be awaited
+            ); //each subsequent call should be awaited
 
         } else {
             return;
@@ -138,21 +153,27 @@ async function getRecommendedArtists(user) {
         recommendedArtistsOptions.errorMessage,
     );
 
-    let recommendedArtists = data.items;
+    if (data && data.items) {
+        let recommendedArtists = data.items;
+    
+        await getNextPageOfRecommendedArtists(
+            data.next,
+            recommendedArtistsOptions.method,
+            recommendedArtistsOptions.headers,
+            recommendedArtists
+        );  
+    
+        return recommendedArtists;
+    } else {
+        logger.error("Unable to retrieve recommended artists or response null");
+        return [];
+    }
 
-    await getNextPageOfRecommendedArtists(
-        data.next,
-        recommendedArtistsOptions.method,
-        recommendedArtistsOptions.headers,
-        recommendedArtists
-    );  
-
-    return recommendedArtists;
 }
 
 async function getNextPageOfReleases(url, method, headers, releases) {
     if (url !== null) {
-        const errorMessage = 'unable to get next page of releases from followed artist'
+        const errorMessage = 'Unable to get next page of releases from followed artist'
 
         const additionalReleases = await handleRequest(
             url,
@@ -201,15 +222,20 @@ async function getReleasesByArtist(user, followedArtists) {
             releasesOptions.errorMessage,
         );
 
-        let artistReleases = data.items;
-
-        await getNextPageOfReleases(
-            data.next,
-            releasesOptions.method,
-            releasesOptions.headers,
-            releases);
-
-        releases.push(...artistReleases);
+        if (data && data.items) {
+            let artistReleases = data.items;
+    
+            await getNextPageOfReleases(
+                data.next,
+                releasesOptions.method,
+                releasesOptions.headers,
+                releases
+            );
+    
+            releases.push(...artistReleases);
+        } else {
+            logger.error("Unable to get releases by artists or response null");
+        }
     }
 
     return releases;

@@ -13,45 +13,51 @@ async function getWeeklyReleases() {
     }
 
     for (const user of users) {
-        logger.info(`Fetching artists and releases for ${user.userEmail}...`);
+        try {
+            logger.info(`Fetching artists and releases for ${user.userEmail}...`);
 
-        const followedArtists = await functions.getFollowedArtists(user);
-        let releases = await functions.getReleasesByArtist(user, followedArtists);
+            const followedArtists = await functions.getFollowedArtists(user);
+            let releases = await functions.getReleasesByArtist(user, followedArtists);
 
-        const numberOfDays = 7;
+            const numberOfDays = 14;
+            //change back to 7
 
-        const filteredReleases = await functions.filterReleases(releases, numberOfDays);
-        const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
-        const formattedReleases = await functions.formatReleases(sortedReleases);
-        
-        const now = new Date();
-        const today = await date.getTodayDateString(now);
-        const subject = await email.handleSubject(formattedReleases, today);
+            const filteredReleases = await functions.filterReleases(releases, numberOfDays);
+            const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
+            const formattedReleases = await functions.formatReleases(sortedReleases);
 
-        let recipientEmail;
+            const now = new Date();
+            const today = await date.getTodayDateString(now);
+            const subject = await email.handleSubject(formattedReleases, today);
 
-        if (user.userPreferredEmail === null || user.userPreferredEmail === undefined) {
-            recipientEmail = user.userEmail;
-        } else {
-            recipientEmail = user.userPreferredEmail;
-        }
+            let recipientEmail;
 
-        const releasesOptions = {
-            from: {
-                name: 'Weekly Releases',
-                address: process.env.EMAIL_USERNAME,
-            },
-            to: recipientEmail,
-            subject: subject,
-            template: 'releases',
-            context: {
-                todayDate: today,
-                releases: formattedReleases,
+            if (user.userPreferredEmail === null || user.userPreferredEmail === undefined) {
+                recipientEmail = user.userEmail;
+            } else {
+                recipientEmail = user.userPreferredEmail;
             }
-        }
 
-        logger.info(`${recipientEmail} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`)
-        await email.sendEmail(releasesOptions);
+            const releasesOptions = {
+                from: {
+                    name: 'Weekly Releases',
+                    address: process.env.EMAIL_USERNAME,
+                },
+                to: recipientEmail,
+                subject: subject,
+                template: 'releases',
+                context: {
+                    todayDate: today,
+                    releases: formattedReleases,
+                }
+            }
+
+            logger.info(`${recipientEmail} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`);
+            await email.sendEmail(releasesOptions);
+            
+        } catch (error) {
+            logger.error(error);
+        }
     }
 } 
 
