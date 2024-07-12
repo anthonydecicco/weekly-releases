@@ -76,7 +76,6 @@ const scheduledRun = cron.schedule('0 7 * * Fri', () => {
         logger.error(error);
     });
 
-    logger.info("Finished getting new releases.");
 }, {
     scheduled: true,
     timezone: "US/Central"

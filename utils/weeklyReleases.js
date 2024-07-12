@@ -19,8 +19,7 @@ async function getWeeklyReleases() {
             const followedArtists = await functions.getFollowedArtists(user);
             let releases = await functions.getReleasesByArtist(user, followedArtists);
 
-            const numberOfDays = 14;
-            //change back to 7
+            const numberOfDays = 7;
 
             const filteredReleases = await functions.filterReleases(releases, numberOfDays);
             const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
@@ -59,6 +58,8 @@ async function getWeeklyReleases() {
             logger.error(error);
         }
     }
+
+    logger.info("Finished getting new releases.");
 } 
 
 module.exports = getWeeklyReleases;
