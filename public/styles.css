@@ -431,7 +431,7 @@ button:active {
 /* about */
 
 .about-intro {
-    height: calc(100vh - 4.5rem);
+    height: calc(100dvh - 4.5rem);
     display: flex;
     flex-direction: column;
 }

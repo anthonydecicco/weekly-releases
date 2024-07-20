@@ -16,7 +16,7 @@ let baseUrl = process.env.BASE_URL;
 if (app.get('env') !== 'production') {
     baseUrl = 'http://localhost:10000/';
 }
-const redirect_uri = baseUrl + "auth/callback";
+const redirect_uri = `${baseUrl}auth/callback`;
 
 function generateRandomString(length) {  
     return randomBytesAsync(60).toString('hex').slice(0, length);

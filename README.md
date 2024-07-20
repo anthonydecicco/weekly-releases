@@ -36,7 +36,7 @@ Spotify does address this through their Release Radar playlist, however, it only
 - Automatic refresh of user's authentication tokens to improve UX
 
 ### Roadmap
-- Continue building out the front-end. I'm currently working with a designer to develop a more processed look and feel for the site.
+- ~Continue building out the front-end. I'm currently working with a designer to develop a more processed look and feel for the site.~
 - ~Continue working on getting the application production ready.~
 - ~Update deprecated packages used in Spotify's Code Flow example.~
 - ~Deploy the application.~

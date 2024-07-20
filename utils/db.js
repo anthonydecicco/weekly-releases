@@ -20,7 +20,7 @@ async function getUsers() {
         const users = await cursor.toArray();
         return users;
     } catch (error) {
-        logger.error("Error fetching users: " + error);
+        logger.error(`Error fetching users: ${error}`);
     } finally {
         await client.close();
     }
@@ -33,7 +33,7 @@ async function getUserInfo(userId) {
         const result = await collection.findOne(filterUserInfo);
         return result;
     } catch (error) {
-        logger.error("Error finding user: " + userId);
+        logger.error(`Error finding user: ${userId}`);
     } finally {
         await client.close();
     }
@@ -83,7 +83,7 @@ async function addOrUpdateUserInfo(userInfo) {
         redirectCheck = false;
 
     } catch (error) {
-        logger.error("Error adding/updating user info " + error);
+        logger.error(`Error adding/updating user info ${error}`);
         
         //if this process fails, redirect user to error page
         redirectCheck = true;
@@ -108,7 +108,7 @@ async function addOrUpdatePreferredEmail(userId, userPreferredEmail) {
         await client.connect();
         const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
     } catch (error) {
-        logger.error("Error adding/updating user's preferred email " + error);
+        logger.error(`Error adding/updating user's preferred email ${error}`);
     } finally {
         await client.close();
         return;
@@ -154,7 +154,7 @@ async function checkForRefreshToken(refreshTokenCookie) {
                 logger.info("No document found using the submitted refresh token.")
             }
         } catch (error) {
-            logger.error("Error checking for refresh token:" + error)
+            logger.error(`Error checking for refresh token: ${error}`)
         } finally {
             await client.close();
         }

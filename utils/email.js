@@ -54,7 +54,7 @@ const helpers = {
 
 async function handleSubject(formattedReleases, today) {
     if (formattedReleases.length > 0) {
-        return `\u{1F6A8}New Music For You | ${today}\u{1F3A7}`
+        return `\u{1F6A8} New Music For You | ${today} \u{1F3A7}`
     } else {
         return `No New Music, Follow More Artists | ${today}`
     }

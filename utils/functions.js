@@ -19,7 +19,7 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
         } else if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
-            logger.warn("Status Code: 429. Will re-try in " + retryAfter + " seconds");
+            logger.warn(`Status Code: 502. Will re-try in ${retryAfter} seconds.`);
 
             const retryAfterMs = parseInt(retryAfter) * 1000;
             await new Promise(resolve => setTimeout(resolve, retryAfterMs));
@@ -27,16 +27,23 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
             return await handleRequest(url, method, headers, body, errorMessage);
             //retry the request
+        
+        } else if (response.status === 502) {
+            const threeSeconds = 3000;
+            logger.warn(`Status Code: 502. Will re-try in ${threeSeconds / 1000} seconds.`);
 
+            await new Promise(resolve => setTimeout(resolve, threeSeconds));
+
+            return await handleRequest(url, method, headers, body, errorMessage);
         } else {
             const errorText = await response.text();
             logger.error(response.status + ": " + errorText);
         }
     } catch (error) {
         if (errorMessage !== null) {
-            logger.error("Error handling request: ", errorMessage)
+            logger.error(`Error handling request: ${errorMessage}`)
         } else {
-            logger.error("Error handling request: ", error)
+            logger.error(`Error handling request: ${error}`)
         }
     }
 
