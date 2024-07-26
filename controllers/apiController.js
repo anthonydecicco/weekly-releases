@@ -46,22 +46,20 @@ async function updateEmailLogic(req, res) {
 }
 
 async function deleteUserDataLogic(req, res) {
-    //Created functions should:
     const userId = req.session.userId;
-    logger.info(`userId = ${userId}`)
     const user = await db.getUserInfo(userId);
-    logger.info(`user = ${user}`);
 
     const userEmail = user.userEmail;
     const submittedEmail = req.body['delete-email'];
+    logger.info(`User submitted ${submittedEmail} to delete account information.`);
 
     if (userEmail !== submittedEmail) {
         res.redirect("/dashboard/settings");
         return;
-        //send message back that deletion failed
+        //TODO: send message back that deletion failed
     }
 
-    logger.info("Emails match");
+    logger.info("Emails match, deleting user information");
 
     const deletedCountUser = await db.deleteUser(userId);
 
