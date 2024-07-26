@@ -19,7 +19,7 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
         } else if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
-            logger.warn(`Status Code: 502. Will re-try in ${retryAfter} seconds.`);
+            logger.warn(`Status Code: 429. Will re-try in ${retryAfter} seconds.`);
 
             const retryAfterMs = parseInt(retryAfter) * 1000;
             await new Promise(resolve => setTimeout(resolve, retryAfterMs));
