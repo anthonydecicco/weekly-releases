@@ -19,21 +19,35 @@ async function handleRequest(url, method, headers, body = null, errorMessage = n
 
         } else if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
-            logger.warn("Status Code: 429. Will re-try in " + retryAfter + " seconds");
+            logger.warn(`Status Code: 429. Will re-try in ${retryAfter} seconds.`);
 
             const retryAfterMs = parseInt(retryAfter) * 1000;
             await new Promise(resolve => setTimeout(resolve, retryAfterMs));
+            //wait the amount of time in retry-after header
 
+            return await handleRequest(url, method, headers, body, errorMessage);
+            //retry the request
+        
+        } else if (response.status === 502) {
+            const threeSeconds = 3000;
+            logger.warn(`Status Code: 502. Will re-try in ${threeSeconds / 1000} seconds.`);
+
+            await new Promise(resolve => setTimeout(resolve, threeSeconds));
+
+            return await handleRequest(url, method, headers, body, errorMessage);
         } else {
-            logger.error(response.status + response.body);
+            const errorText = await response.text();
+            logger.error(response.status + ": " + errorText);
         }
     } catch (error) {
         if (errorMessage !== null) {
-            logger.error("Error handling request: ", errorMessage)
+            logger.error(`Error handling request: ${errorMessage}`)
         } else {
-            logger.error("Error handling request: ", error)
+            logger.error(`Error handling request: ${error}`)
         }
     }
+
+    return null;
 }
 
 async function getNextPageOfArtists(url, method, headers, followedArtists) {
@@ -55,7 +69,7 @@ async function getNextPageOfArtists(url, method, headers, followedArtists) {
                 method,
                 headers,
                 followedArtists
-            ) //each subsequent call should be awaited
+            ); //each subsequent call should be awaited
 
         } else {
             return;
@@ -81,21 +95,92 @@ async function getFollowedArtists(user) {
         followedArtistsOptions.errorMessage,
     );
 
-    let followedArtists = data.artists.items;
+    if (data && data.artists && data.artists.items) {
+        let followedArtists = data.artists.items;
+        //if successful API call, and the format is as expected
 
-    await getNextPageOfArtists(
-        data.artists.next,
-        followedArtistsOptions.method,
-        followedArtistsOptions.headers,
-        followedArtists
+        await getNextPageOfArtists(
+            data.artists.next,
+            followedArtistsOptions.method,
+            followedArtistsOptions.headers,
+            followedArtists
+        );
+
+        return followedArtists;
+    } else {
+        logger.error("Unable to retrieve followed artists or response is null");
+        return [];
+        //return an empty array if unable to retrieve followed artists
+        //this keeps the for loop in weeklyReleases.js cycling
+    }
+}
+
+async function getNextPageOfRecommendedArtists(url, method, headers, followedArtists) {
+    if (url !== null) {
+        const errorMessage = 'Unable to get the next page of followed artists'
+
+        const additionalArtists = await handleRequest(
+            url,
+            method,
+            headers,
+            null,
+            errorMessage);
+        
+        followedArtists.push(...additionalArtists.items);
+
+        if (additionalArtists.next !== null) {
+            await getNextPageOfRecommendedArtists(
+                additionalArtists.next,
+                method,
+                headers,
+                followedArtists
+            ); //each subsequent call should be awaited
+
+        } else {
+            return;
+        }
+    } else return;
+}
+
+async function getRecommendedArtists(user) {
+    const access_token = user.userTempAccessToken;
+
+    const recommendedArtistsOptions = {
+        url: 'https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50',
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        errorMessage: 'unable to get initial request for followed artists'
+    };
+
+    const data = await handleRequest(
+        recommendedArtistsOptions.url,
+        recommendedArtistsOptions.method,
+        recommendedArtistsOptions.headers,
+        null,
+        recommendedArtistsOptions.errorMessage,
     );
 
-    return followedArtists;
+    if (data && data.items) {
+        let recommendedArtists = data.items;
+    
+        await getNextPageOfRecommendedArtists(
+            data.next,
+            recommendedArtistsOptions.method,
+            recommendedArtistsOptions.headers,
+            recommendedArtists
+        );  
+    
+        return recommendedArtists;
+    } else {
+        logger.error("Unable to retrieve recommended artists or response null");
+        return [];
+    }
+
 }
 
 async function getNextPageOfReleases(url, method, headers, releases) {
     if (url !== null) {
-        const errorMessage = 'unable to get next page of releases from followed artist'
+        const errorMessage = 'Unable to get next page of releases from followed artist'
 
         const additionalReleases = await handleRequest(
             url,
@@ -144,15 +229,20 @@ async function getReleasesByArtist(user, followedArtists) {
             releasesOptions.errorMessage,
         );
 
-        let artistReleases = data.items;
-
-        await getNextPageOfReleases(
-            data.next,
-            releasesOptions.method,
-            releasesOptions.headers,
-            releases);
-
-        releases.push(...artistReleases);
+        if (data && data.items) {
+            let artistReleases = data.items;
+    
+            await getNextPageOfReleases(
+                data.next,
+                releasesOptions.method,
+                releasesOptions.headers,
+                releases
+            );
+    
+            releases.push(...artistReleases);
+        } else {
+            logger.error("Unable to get releases by artists or response null");
+        }
     }
 
     return releases;
@@ -202,9 +292,12 @@ async function formatReleases(releases) {
     return releases;
 }
 
-exports.handleRequest = handleRequest;
-exports.getFollowedArtists = getFollowedArtists;
-exports.getReleasesByArtist = getReleasesByArtist;
-exports.sortReleasesByMostRecent = sortReleasesByMostRecent;
-exports.filterReleases = filterReleases;
-exports.formatReleases = formatReleases;
+module.exports = {
+    handleRequest,
+    getFollowedArtists,
+    getRecommendedArtists,
+    getReleasesByArtist,
+    sortReleasesByMostRecent,
+    filterReleases,
+    formatReleases,
+}

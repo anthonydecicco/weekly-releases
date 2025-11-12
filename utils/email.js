@@ -1,7 +1,9 @@
 const nodemailer = require('nodemailer');
 const hbs = require('nodemailer-express-handlebars');
 const path = require('path');
-const logger = require('../utils/logger');
+const logger = require('./logger');
+const date = require("./date");
+const dummyData = require("./dummyData");
 
 const helpers = {
     compare(variableOne, comparator, variableTwo) {
@@ -52,17 +54,17 @@ const helpers = {
 
 async function handleSubject(formattedReleases, today) {
     if (formattedReleases.length > 0) {
-        return `\u{1F6A8}New Music For You | ${today}\u{1F3A7}`
+        return `\u{1F6A8} New Music For You | ${today} \u{1F3A7}`
     } else {
         return `No New Music, Follow More Artists | ${today}`
     }
 }
 
-async function sendEmail(userEmail, options) {
+async function sendEmail(options) {
     const transporter = nodemailer.createTransport({
         pool: true,
-        host: "smtp.forwardemail.net",
-        port: 2465,
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
         secure: true,
         auth: {
             user: process.env.EMAIL_USERNAME,
@@ -85,12 +87,35 @@ async function sendEmail(userEmail, options) {
 
     transporter.sendMail(options, (error, info) => {
         if (error) {
-            logger.error(`Error sending to ${userEmail}. Erroer Message: ${error}`);
+            logger.error(`Error sending to ${options.to}. Erroer Message: ${error}`);
         } else {
-            logger.info(`Email sent to ${userEmail}. Response: ${info.response}`)
+            logger.info(`Email sent to ${options.to}. Response: ${info.response}`)
         }
     });
 }
 
-exports.sendEmail = sendEmail;
-exports.handleSubject = handleSubject;
+function sendTestEmail() {
+    const now = new Date();
+
+    const options = {
+        from: {
+            name: 'Test',
+            address: process.env.EMAIL_USERNAME,
+        },
+        to: process.env.TESTING_EMAIL,
+        subject: "Test Email",
+        template: 'releases', //updated version
+        context: {
+            todayDate: date.getTodayDateString(now),
+            releases: dummyData,
+        }
+    }
+
+    sendEmail(options);
+}
+
+module.exports = {
+    handleSubject,
+    sendEmail,
+    sendTestEmail,
+}

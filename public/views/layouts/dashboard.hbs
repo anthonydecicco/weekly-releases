@@ -8,7 +8,8 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../../images/favicon/apple-touch-icon.png?">
     <link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon/favicon-32x32.png?">
     <link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon/favicon-16x16.png?">
-    {{!-- <link rel="manifest" href="../../images/favicon/site.webmanifest"> --}}
+    {{!--
+    <link rel="manifest" href="../../images/favicon/site.webmanifest"> --}}
     <link rel="stylesheet" href="../../styles.css">
 </head>
 
@@ -47,20 +48,43 @@
             </nav>
         </header>
 
-        {{#if leftAlign}}
+
         <main>
-            {{else}}
-            <main class="center-main-items-text">
-                {{/if}}
+            <h1>Dashboard - {{dashSubTitle}}</h1>
+            <div class="dash-container">
+                <section class="dash-sidebar">
+                    <div class="user-info-card">
+                        <a href="{{userUrl}}" class="user-image-a" target="_blank">
+                            <img id="user-image" src="{{userImage.url}}" />
+                        </a>
+                        <div class="user-info-container">
+                            <p id="user-display-name">Display Name: {{userDisplayName}}</p>
+                            <p id="user-email">Email: {{userEmail}}</p>
+                            <p id="user-id">Spotify ID: {{userId}}</p>
+                        </div>
+                    </div>
+                    <div class=""></div>
+                    <div class="sidebar-nav">
+                        <a href="/dashboard/followed" class="sidebar-nav-button {{followedActive}}">Followed</a>
+                        {{!-- <a href="/dashboard/recommended" class="sidebar-nav-button {{recommendedActive}}">Recommended</a> --}}
+                        <a href="/dashboard/settings" class="sidebar-nav-button {{settingsActive}}">Settings</a>
+                    </div>
+                </section>
+                <div class="dash-main">
+                    <div class="loading-indicator display-none">
+                        Fetching information...
+                    </div>
+                    {{{body}}}
+                </div>
+            </div>
+        </main>
 
-                {{{body}}}
+        <footer class="flex-end">
+            <a class="nav-links" href="/privacy-policy">Privacy Policy</a>
+        </footer>
 
-            </main>
-
-            <footer class="flex-end">
-                <a class="nav-links" href="/privacy-policy">Privacy Policy</a>
-            </footer>
     </div>
+
     <script src="../../scripts/layout.js"></script>
     {{#if additionalScript}}
     <script src="../../scripts/{{additionalScript}}"></script>

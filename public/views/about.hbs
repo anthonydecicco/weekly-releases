@@ -1,37 +1,81 @@
-<h1>About</h1>
-<h2>What is Weekly Releases?</h2>
-<p>Weekly Releases is an application that sends you (the user) an email weekly with new song and album releases from
-    your followed artists on Spotify.</p>
+<section class="about-intro">
+    <div class="bg-img-container bg-not-fixed opacity-20">
+        <img class="bg-img-full" src="..\images\Union.svg">
+    </div>
+    <div class="column about-column">
+        <h1 class="section-heading">About</h1>
+        <h2 class="section-emphasis">What is Weekly Releases?</h2>
+        <p>Weekly Releases is an application that sends you an email weekly with new song and album releases
+            from
+            your followed artists on Spotify.</p>
+    </div>
+    <p class="seizure-warning">Potential seizure warning below.</p>
+</section>
+<section class="two-column-section bg-gray">
+    <div class="column flex middle-align">
+        <div class="img-container-column">
+            <img class="image-column" alt="Walker and Royce concert in Chicago, January 28th, 2024"
+                src="../images/WalkerAndRoyceClip.avif">
+        </div>
+    </div>
+    <div class="column">
+        <h1 class="section-heading">Purpose</h1>
+        <h2 class="section-emphasis">I love music.</h2>
+        <p>I love to listen to music, and I explore a wide range of genres and artists. About a year ago, I found it
+            increasingly difficult to keep track of new music releases from my favorite artists. Having stopped using
+            social
+            media a few years back, I lost my primary source of staying up-to-date with new releases. Often, I would
+            discover
+            weeks, months, or even a year later that one of my favorite artists had released a new album.</p>
+        <p>While Spotify offers the Release Radar playlist, it only features one song per artist per week, without any
+            notification of updates. Additionally, only some artists' new albums or singles are promoted to users
+            through
+            emails or push notifications. So I decided to create a service that compiles a comprehensive list of
+            songs
+            and albums from the artists you follow and delivers it directly to your inbox, every week.</p>
+    </div>
+</section>
 
-<h2>Purpose</h2>
-<p>I love to listen to music, and I explore a wide range of genres and artists. About a year ago, I found it
-    increasingly difficult to keep track of new music releases from my favorite artists. Having stopped using social
-    media a few years back, I lost my primary source of staying up-to-date with new releases. Often, I would discover
-    weeks, months, or even a year later that one of my favorite artists had released a new album.</p>
-<p>While Spotify offers the Release Radar playlist, it only features one song per artist per week, without any
-    notification of updates. Additionally, only some artists' new albums or singles are promoted to users through
-    emails or push notifications. Hence, I decided to create a service that compiles a comprehensive list of songs
-    and albums from the artists you follow and delivers it directly to your inbox regularly.</p>
+<section class="two-column-section">
+    <div class="column">
+        <h1 class="section-heading">How Does it Work?</h1>
+        <p>When you authorize this application through your Spotify account, you grant permission to store your Spotify
+            account information in our database. Rest assured, we never ask for your password or other
+            sensitive
+            information. We only request permission to view your username, email, your followed
+            artists, your top artists, and the ability to modify your followed artists (future features may depend on
+            this).
+        </p>
 
-<h2>How Does it Work?</h2>
-<p>When you authenticate this application with your Spotify account, you grant permission to store your Spotify
-    account information in the application's database. Rest assured, we never ask for your password or other sensitive
-    information. We only request permission to access your username, email, the privilege to view your followed
-    artists, and the privilege to modify your followed artists (future features may depend on this). The application
-    then utilizes your information to interact with the <a href="https://developer.spotify.com/documentation/web-api"
-        target="_blank">Spotify Web API</a>, enabling us to retrieve your followed artists and their releases. The
-    application processes this data, filters for the past seven days, and sends you an email with the latest
-    releases.</p>
-
-<h2>Ending Service</h2>
-<p>If you would like to discontinue use of this app, and delete your data from the database, follow these steps:</p>
-<ul>
-    <li>Review this Spotify Support <a href="https://support.spotify.com/us/article/spotify-on-other-apps/"
-            target="_blank">article</a> to remove authorization of this application.</li>
-    <li>Send an email to support@weeklyreleases.com asking to delete your account information from the database.</li>
-</ul>
-
-<h2>Interested in Learning More?</h2>
-<p>If you'd like to delve deeper into this project or take a look at the code, please visit the application's
-    repository on <a href="https://github.com/anthonydecicco/weekly-releases" target="_blank">GitHub</a>. Feel free
-    to shoot me a direct message; I'd love to connect!</p>
+        <p>
+            Those permissions are needed for interfacing with the <a
+                href="https://developer.spotify.com/documentation/web-api" target="_blank">Spotify Web API</a>, enabling
+            us to retrieve your followed artists and their releases. Weekly Releases processes this data, filters for
+            the past seven days, and sends you an email with the latest
+            releases, every Friday morning.</p>
+    </div>
+    <div class="column">
+        <h1 class="section-heading">Ending Service</h1>
+        <p>If you would like to delete your data from our database, and discontinue use of this service follow these
+            steps:
+        </p>
+        <ol>
+            <li>Navigate to the <a href="/dashboard/settings">settings page</a> on your dashboard and review the "MANAGE YOUR
+                DATA" section. If you're not seeing your dashboard, make sure you've authorized this app through Spotify
+                (you can do this by navigating to <a href="/register">SIGN ME UP →</a> and clicking on "AUTHORIZE ON
+                SPOTIFY").
+            </li>
+            <li>Review this Spotify Support <a href="https://support.spotify.com/us/article/spotify-on-other-apps/"
+                    target="_blank">article</a> to remove authorization of this application.</li>
+        </ol>
+    </div>
+</section>
+<section class="single-column-section bg-gray">
+    <div class="column learn-more">
+        <h1 class="section-heading">Interested in Learning More?</h1>
+        <p>If you'd like to delve deeper into this project or take a look at the code, please visit the application's
+            repository on <a href="https://github.com/anthonydecicco/weekly-releases" target="_blank">GitHub</a>. Feel
+            free
+            to shoot me a direct message; I'd love to connect!</p>
+    </div>
+</section>

@@ -1,198 +1,87 @@
 require('dotenv').config();
 
+//import node modules
 const express = require('express');
 const cron = require('node-cron');
 const helmet = require('helmet');
-const handlebars = require('express-handlebars');
-const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
-
-const functions = require('./utils/functions');
-const auth = require('./auth/auth');
-const authFunctions = require('./auth/auth.helper.functions');
-const email = require('./email/email');
-const db = require('./utils/db');
 const path = require('path');
-const date = require('./utils/date');
+const session = require('express-session');
+
+//import routers
+const appRouter = require('./routes/appRouter');
+const testRouter = require('./routes/testRouter');
+const authRouter = require('./routes/authRouter');
+const apiRouter = require('./routes/apiRouter');
+const dashRouter = require('./routes/dashRouter');
+
+//import utils
 const logger = require('./utils/logger');
+const hbs = require('./utils/hbsEngine');
+const sessionObject = require('./utils/sessionObject');
+const getWeeklyReleases = require('./utils/weeklyReleases');
 
 const app = express();
 const port = process.env.PORT;
 
-app.disable('x-powered-by');
-
-app.set('trust proxy', 1);
-
-const hbs = handlebars.create({
-    extname: '.hbs',
-    defaultLayout: 'main',
-    layoutsDir: __dirname + '/public/views/layouts/'
-});
-
+//set view engine
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, './public', 'views'));
-
-const store = new MongoDBStore({
-    uri: process.env.DATABASE_URL,
-    databaseName: process.env.DATABASE_NAME,
-    collection: process.env.DATABASE_COLLECTION_SESSIONS
-},
-    function (error) {
-        if (error) {
-            logger.error(error)
-        }
-    }
-);
-
-const second = 1000;
-const minute = second * 60;
-const hour = minute * 60;
-const day = hour * 24;
-const maxAge = day * 3;
-
-let sessionObject = {
-    cookie: { maxAge: maxAge } ,
-    name: process.env.SESSION_NAME,
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: false,
-    store: store,
-}
+app.set('views', path.join(__dirname,'.', 'public', 'views'));
 
 //if production, set cookies to secure
 if (app.get('env') === 'production') {
+    app.disable('x-powered-by');
     app.set('trust proxy', 1); 
     sessionObject.cookie.secure = true; 
 }
 
+//set middleware
 app.use(session(sessionObject));
-app.use(helmet());
+app.use(
+    helmet.contentSecurityPolicy({
+      useDefaults: true,
+      directives: {
+        "img-src": ["'self'", "https: data:"]
+      }
+    })
+  )
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/auth', auth);
+
+//set routers
+app.use('/', appRouter);
+app.use('/dashboard', dashRouter);
+app.use('/auth', authRouter);
+app.use('/api', apiRouter);
 app.use(express.static('public'));
+if (app.get('env') !== 'production') {
+    app.use('/test', testRouter);
+}
 
-app.get('/', async (req, res) => {
-    return res.render('index', {
-        metaTitle: "Landing Page",
-        isAuth: req.session.isAuth, //if isAuth = null/false, do not show certain site elements
-    });
+app.use(function (req, res, next) {
+    res.status(404);
+    res.json("Status: 404, Page not found");
+    next();
 });
 
-app.get('/confirmation', async function (req, res) {
-    if (req.session.isAuth) {
-        return res.render('confirmation', {
-            metaTitle: "You're In!",
-            isAuth: req.session.isAuth,
-        });
-    } else {
-        res.redirect('/register');
-    }
-});
+// getWeeklyReleases().catch((error) => {
+//     logger.error(error);
+// });
 
-app.get('/register', async function (req, res) {
-    return res.render('register', {
-        metaTitle: "Sign Up Now",
-        isAuth: req.session.isAuth,
-    });
-});
+//fetch weekly releases every Friday at 7am, Central Standard Time
+const scheduledRun = cron.schedule('0 7 * * Fri', () => {
+    logger.info("Starting the 7am request for new releases...\n")
 
-
-//dashboard path is work in progress
-app.get('/dashboard', async function (req, res) {
-    if (req.session.isAuth) {
-        return res.render('dashboard', {
-            metaTitle: "Dashboard",
-            isAuth: req.session.isAuth,
-            userId: req.session.userId
-        });
-    } else {
-        res.redirect('/register');
-    }
-});
-
-app.get('/about', async function (req, res) {
-    return res.render('about', {
-        metaTitle: "Learn More",
-        isAuth: req.session.isAuth,
-        leftAlign: true,
-    });
-});
-
-app.get('/privacy-policy', async function (req, res) {
-    return res.render('privacy-policy', {
-        metaTitle: "Privacy Policy",
-        isAuth: req.session.isAuth,
-        leftAlign: true,
-    });
-});
-
-async function run() {
-    const users = await db.getUsers();
-
-    await authFunctions.refreshAccessTokens(users);
-
-    for (const user of users) {
-        logger.info(`Fetching artists and releases for ${user.userEmail}...`);
-
-        const followedArtists = await functions.getFollowedArtists(user);
-        let releases = await functions.getReleasesByArtist(user, followedArtists);
-
-        const numberOfDays = 7;
-
-        const filteredReleases = await functions.filterReleases(releases, numberOfDays);
-        const sortedReleases = await functions.sortReleasesByMostRecent(filteredReleases);
-        const formattedReleases = await functions.formatReleases(sortedReleases);
-        
-        const now = new Date();
-        const today = await date.getTodayDateString(now);
-        const subject = await email.handleSubject(formattedReleases, today);
-
-        const releasesOptions = {
-            from: {
-                name: 'Weekly Releases',
-                address: 'anthony@weeklyreleases.com',
-            },
-            to: user.userEmail,
-            subject: subject,
-            template: 'releases',
-            context: {
-                todayDate: today,
-                releases: formattedReleases,
-            }
-        }
-
-        logger.info(`${user.userEmail} follows ${followedArtists.length} artists. They came out with ${formattedReleases.length} releases.`)
-        await email.sendEmail(user.userEmail, releasesOptions);
-    }
-} 
-
-// await run().catch(console.error);
-
-// schedule the run() function to occur once, every Friday at 8am, Central Standard Time
-const scheduledRun = cron.schedule('0 8 * * Fri', () => {
-    logger.info("Starting the 8am request for new releases...\n")
-
-    run().catch((error) => {
+    getWeeklyReleases().catch((error) => {
         logger.error(error);
     });
-    
+
 }, {
     scheduled: true,
     timezone: "US/Central"
 });
 
 scheduledRun.start();
-
-app.use((req, res, next) => {
-    res.status(404).send("Sorry can't find that!")
-});
-
-app.use((err, req, res, next) => {
-    logger.error(err.stack)
-    res.status(500).send('Something broke!')
-});
 
 app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);

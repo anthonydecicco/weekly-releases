@@ -1,15 +1,42 @@
-body {
-    box-sizing: border-box;
-    padding: 0px;
-    margin: 0px;
-    width: 100%;
-    height: calc(100vh - 8rem);
-    font-family: 'Segoe UI', sans-serif;
+/* Fonts */
+
+@font-face {
+    font-family: "Manrope";
+    src: url("./fonts/Manrope-VariableFont_wght.ttf") format("woff2-variations");
+    font-weight: 125 950;
+    font-style: normal;
 }
 
-.center-main-items-text {
-    align-items: center;
-    text-align: center;
+@font-face {
+    font-family: "IBMPlexMono";
+    src: url("./fonts/IBMPlexMono-Regular.ttf"); 
+}
+
+
+
+/* body, main, header, footer, h1 */
+html, body {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0px;
+    margin: 0px;
+    color: white;
+    /* background-color: rgb(39, 34, 29); */
+    /* background-color: rgb(40, 33, 39); */
+    background-color: rgb(14, 13, 14);
+    font-family: 'Manrope';
+    font-weight: lighter;
+}
+
+.column-wrapper {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 main {
@@ -17,34 +44,18 @@ main {
     display: flex;
     flex-direction: column;
     padding: 0 24px 0 24px;
-    margin-bottom: 2rem;
+    flex-grow: 1;
+    flex-shrink: 0;
+    max-width: 100%;
 } 
 
 header, footer {
     width: 100%;
-    height: 3rem;
-    border: solid;
+    height: 4.5rem;
     display: flex;
     align-items: center;
-    background-color: rgb(0, 0, 0);
-    justify-content: center;
-    color: white;
-    border: 0;
-}
-
-nav {
-    display: flex;
-    justify-content: center;
-}
-
-.nav-links {
-    margin: 0px 40px 0px 40px;
-}
-
-.spotify-logo {
-    width: 100px;
-    height: auto;
-    margin: 0 10px 0 10px;
+    flex-shrink: 0;
+    font-size: 18px;
 }
 
 .footer-spacing {
@@ -53,26 +64,754 @@ nav {
 
 h1 {
     margin-top: 50px;
+    font-weight: normal;
+}
+
+h2 {
+    margin-bottom: 2px;
+    font-weight: normal;
+}
+
+.center-main-items-text {
+    align-items: center;
+    text-align: center;
+}
+
+ol > li {
+    margin-top: 12px;
+}
+
+p, li, label {
+    font-size: 20px;
+}
+
+
+
+/* nav, a, related */
+
+nav {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.nav-group-right {
+    height: 100%;
+    display: none;
+    text-align: center;
+    align-items: center;
 }
 
 a {
     color: inherit;
-}
-
-main > p > a, main > ul > li > p > a {
-    color: rgb(78, 137, 160);
+    height: fit-content;
+    width: fit-content;
+    display: inline-block;
+    position: relative;
     font-weight: bold;
+    color: #FFAD32;
 }
 
-.special-note {
+.nav-links {
+    margin: 0px 48px 0px 0px;
+    min-width: fit-content;
+    display: flex;
+    align-items: center;
+    font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: normal;
+    color: white;
+}
+
+.nav-links::after {
+    content: "";
+    background: white;
+    mix-blend-mode: exclusion;
+    width: calc(100% + 6px);
+    height: 0;
+    position: absolute;
+    bottom: -4px;
+    left: -3px;
+    transition: all .3s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    text-decoration: none;
+}
+
+.nav-links:hover::after {
+    height: calc(100% + 6px);
+}
+
+.a-link-after-none::after {
+    content: none;
+}
+
+.hamburger-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 80%;
+    width: fit-content;
+    padding: 2px;
+    z-index: 3;
+    margin-right: 24px;
+}
+
+.hamburger-container:hover {
+    cursor: pointer;
+}
+
+.hamburger {
+    width: 40px;
+    height: 2px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+}
+
+.hamburger-menu {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgb(200, 178, 201);
+    opacity: 95%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.hamburger-link {
+    margin-right: 0;
+    margin-bottom: 20px;
+    color: black;
+}
+
+
+
+/* utilities */
+
+input {
+    all: unset;
+}
+
+input:focus {
+    caret-color: white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #d8d8d8;
+  -webkit-box-shadow: 0 0 0px 40rem #000000 inset;
+}
+
+
+button {
+    all: unset;
+    font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: .9rem;
+    background-color: white;
+    color: black;
+    border-radius: 17px;
+    padding: 10px 20px 10px 20px;
+    height: fit-content;
+    min-width: fit-content;
+    max-width: max-content;
+    transition: all .4s ease;
+}
+
+button:hover {
+    color: #d156aa;
+    transform: translate(0, -3%);
+    cursor: pointer;
+}
+
+button:active {
+    filter: invert(1);
+    transform: translate(0, 5%);
+}
+
+.img-container {
+    width: 100%;
+    height: fit-content;
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.img-container-column {
+    width: 100%;
+    height: auto;
+    margin: 20px 0px 20px 0px;
+}
+
+.image-column {
+    width: 100%;
+    object-fit: contain;
+}
+
+.flex {
+    display: flex;
+}
+
+.middle-align {
+    justify-self: center;
+    align-self: center;
+}
+
+.flex-end {
+    justify-content: flex-end;
+}
+
+.flex-column {
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.no-text-dec {
+    text-decoration: none;
+}
+
+.italic {
     font-style: italic;
 }
 
-.flex-container {
+.logo-container {
+    height: 4.5rem;
+}
+
+.display-none {
+    display: none;
+}
+
+.invert {
+    filter: invert(1);
+}
+
+.loading-indicator {
+    height: 100%;
+    width: 100%;
+    font-size: 40px;
+    text-align: center;
+}
+
+.no-artists-indicator {
+    height: 100%;
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+}
+
+.two-column-section {
+    display: inline-flex;
+    flex-wrap: wrap;
+    width: 100%;
+    min-height: fit-content;
+    padding: 24px 24px 40px 24px;
+    margin: 0 -24px 0 -24px;
+}
+
+.single-column-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 24px 24px 40px 24px;
+    margin: 0 -24px 0 -24px;
+}
+
+.column {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.bg-gray {
+    background-color: #231f21;
+}
+
+.section-heading {
+    margin: 32px 0px 24px 0px;
+    color:#d156aa;
+    font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    font-size: 16px;
+}
+
+.section-emphasis {
+    margin: unset;
+    font-size: 32px;
+}
+
+
+
+/* Spotify Logo */
+
+.spotify-container {
+    display: flex;
+    width: fit-content;
+}
+
+.spotify-logo {
+    width: 100px;
+    object-fit: contain;
+    height: auto;
+    margin: 0 10px 0 10px;
+}
+
+
+
+/* Logo */
+
+.logo {
+    margin-top: 6px;
+    margin-left: 24px;
+    display: flex;
+    height: 80%;
+    width: fit-content;
+    align-items: center;
+}
+
+.logo-img {
+    width: auto;
+    margin-right: 10px;
+    filter: brightness(0) saturate(100%) invert(39%) sepia(74%) saturate(705%) hue-rotate(270deg) brightness(98%) contrast(78%);
+    /* d156aa */
+    height: 50%;
+}
+
+.logo-words {
+    height: 40%;
+    width: auto;
+    display: none;
+}
+
+
+
+/* index */
+
+.index-h1, .index-sign-up {
+    font-size: 36px;
+}
+
+.index-h1 {
+    font-weight: normal;   
+    margin-bottom: 15px;
+}
+
+.index-message {
+    max-width: 100%;
+    margin-top: 0;
+    font-size: 28px;
+    margin-right: 0;
+}
+
+.index-sign-up {
+    font-weight: bolder;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.index-spacing {
+    flex-grow: 3;
+}
+
+
+
+/* about */
+
+.about-intro {
+    height: calc(100dvh - 4.5rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.about-column {
+    margin-top: 88px;
+}
+
+.learn-more {
+    margin-top: 75px;
+    margin-bottom: 75px;
+}
+
+.seizure-warning {
+    text-transform: uppercase;
+    font-size: 22px;
+}
+
+
+
+/* Background images */
+
+.bg-img-container {
+    position: fixed;
+    background-image: url(./images/index-gradient-bg.png);
+    background-size: cover;
+    top: 0;
+    height: 100vh;
+    min-width: 100%;
+    overflow: hidden;
+    z-index: -1;
+    margin-left: -24px;
+}
+
+.bg-img-right {
+    position: absolute;
+    top: 0;
+    width: 100vh;
+    min-height: 100%;
+    mix-blend-mode: exclusion;
+    object-fit: cover;
+    opacity: 15%;
+    z-index: -1;
+    left: 0;
+}
+
+.bg-img-full {
+    position: absolute;
+    top: 0;
+    width: auto;
+    height: 100%;
+    mix-blend-mode: exclusion;
+    object-fit: contain;
+    opacity: 20%;
+    z-index: -1;
+    right: 0;
+}
+
+.bg-not-fixed {
+    position: absolute;
+}
+
+.opacity-20 {
+    opacity: 20%;
+}
+
+.opacity-60 {
+    opacity: 60%;
+}
+
+
+/* Dashboard Layout */
+
+.dash-container {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.dash-sidebar {
+    min-width: fit-content;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.user-info-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: #231f21;
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+#user-display-name, #user-email, #user-id {
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+#user-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.sidebar-nav {
     display: flex;
     width: 100%;
+    justify-content: space-evenly;
+    font-size: 16px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.sidebar-nav-button {
+    display: flex;
+    margin-top: 20px;
     justify-content: center;
-    height: fit-content;
+    margin-left: 10px;
+    margin-right: 10px;
+    min-width: fit-content;
     align-items: center;
-    font-style: italic;
+    font-family: "IBMPlexMono";
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: normal;
+    color: white;
+}
+
+.sidebar-nav-button:hover {
+    cursor: pointer;
+}
+
+.sidebar-nav-button-current {
+    background-color: white;
+    color: black;
+}
+
+.dash-main {
+    padding-top: 1px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+
+.card {
+    text-align: center;
+    margin: 0 3px 50px 3px;
+    vertical-align: top;
+    width: 275px;
+    height: 300px;
+    padding-bottom: 15px;
+    /* background-color: #110f10; */
+    background-color: #231f21;
+    border-radius: 10px;
+    transition: ease-in-out;
+    transition-duration: 0.2s;
+    text-decoration: none;
+    font-weight: normal;
+    color: white;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card-img-container {
+    width: 100%;
+    height: 250px;
+    margin-bottom: 2px;
+    object-fit: contain;
+    overflow: hidden;
+    /* border-radius: 10px; */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.settings-section {
+    height: fit-content;
+    width: 100%;
+    border-top: 1px solid white;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.settings-section:last-child {
+    border-bottom: 1px solid white;
+}
+
+.settings-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.settings-input {
+    width: 90%;
+    margin-left: 2px;
+    margin-right: 2px;
+    height: fit-content;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    color: white;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.input-button-container {
+    display: block;
+}
+
+
+/* Media queries */
+
+@media screen and (min-width: 390px) {
+    .index-h1, .index-sign-up {
+        font-size: 39px;
+    }
+    .index-message {
+        font-size: 33px;
+    }
+    #user-image {
+        height: 90px;
+        width: 90px;
+        margin-left: 10px;
+        margin-bottom: 5px;
+    }
+    .user-info-container {
+        margin-left: 10px;
+    }
+
+}
+
+@media screen and (min-width: 490px) {
+    .user-info-container {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (min-width: 700px) {
+    .bg-img-container {
+        margin-left: -48px;
+    }
+    .bg-img-right {
+        left: 50%;
+        width: 50%;
+    }
+    .index-message {
+        margin-right: 15%;
+    }
+    .index-h1, .index-sign-up {
+        font-size: 44px;
+    }
+    .index-message {
+        font-size: 40px;
+    }
+    .logo-words{
+        display: block;
+    }
+    header, footer {
+        font-size: 20px;
+    }
+    main {
+        padding: 0 48px 0 48px;
+    }
+    .logo {
+        margin-left: 48px;
+    }
+    #user-image {
+        margin-left: 10px;
+    }
+    .user-info-container {
+        margin-left: 20px;
+    }
+    .sidebar-nav {
+        font-size: 24px;
+        align-items: flex-start;
+    }
+    .input-button-container {
+        display: flex;
+        align-items: center;
+    }
+    .settings-input {
+        max-width: 60%;
+        margin-right: 15px;
+    }
+    .two-column-section, .single-column-section {
+        padding: 64px 48px 80px 48px;
+        margin: 0 -48px 0 -48px;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .dash-container {
+        min-height: 100%;
+        width: 100%;
+        flex-wrap: nowrap;
+        flex-direction: unset;
+    }
+    .dash-sidebar {
+        top: 3rem;
+        position: sticky;
+        align-self: start;
+        flex-direction: column;
+        margin-right: 25px;
+    }
+    .user-info-card {
+        flex-direction: column;
+        align-items: unset;
+    }
+    .user-info-container {
+        margin-left: 10px;
+    }
+    .sidebar-nav {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    .sidebar-nav-button {
+        margin-left: 5px;
+    }
+    #user-image {
+        width: 150px;
+        height: 150px;
+    }
+    .nav-group-right {
+        display: flex;
+    }
+    .hamburger-container {
+        display: none;
+    }
+    .settings-section {
+        margin-left: 40px;
+    }
+    .two-column-section {
+        flex-wrap: nowrap;
+    }
+    .column {
+        width: 50%;
+    }
+    .column:first-child {
+        padding-right: 48px;
+    }
+    .column:last-child {
+        padding-left: 48px;
+    }
+    .img-container-column {
+        width: 85%;
+        margin: auto;
+    }
+
+}
+
+@media screen and (min-width: 1100px) {
+    .index-message {
+        margin-right: 30%;
+    }
+    .hamburger-container {
+        display: none;
+    }
+    .img-container-column {
+        width: 75%;
+    }
 }
