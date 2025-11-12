@@ -1,5 +1,6 @@
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const logger = require('./logger');
 
 const second = 1000;
 const minute = second * 60;
