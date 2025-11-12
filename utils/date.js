@@ -35,5 +35,7 @@ async function formatSpotifyDate(date) {
 	return `${month}/${day}/${year}`;
 }
 
-exports.getTodayDateString = getTodayDateString;
-exports.formatSpotifyDate = formatSpotifyDate;
+module.exports = {
+	getTodayDateString,
+	formatSpotifyDate,
+}

@@ -5,6 +5,5 @@ function redirectToSpotifyAuth() {
 }
 
 if (authButton) {
-    //Check for existence to remove error messages on pages that do not have button
     authButton.addEventListener("click", redirectToSpotifyAuth);
 }

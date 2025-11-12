@@ -20,7 +20,20 @@ async function getUsers() {
         const users = await cursor.toArray();
         return users;
     } catch (error) {
-        logger.error("Error fetching users: " + error);
+        logger.error(`Error fetching users: ${error}`);
+    } finally {
+        await client.close();
+    }
+}
+
+async function getUserInfo(userId) {
+    try {
+        await client.connect();
+        const filterUserInfo = { "userId": userId };
+        const result = await collection.findOne(filterUserInfo);
+        return result;
+    } catch (error) {
+        logger.error(`Error finding user: ${userId}`);
     } finally {
         await client.close();
     }
@@ -30,6 +43,8 @@ async function addOrUpdateUserInfo(userInfo) {
     const filterUserInfo = { "userId": userInfo.userId };
     const updateUserInfo = {
         $set: {
+            userImage: userInfo.userImage,
+            userDisplayName: userInfo.userDisplayName,
             userEmail: userInfo.userEmail,
             userTempAccessToken: userInfo.userTempAccessToken,
             userRefreshToken: userInfo.userRefreshToken,
@@ -68,7 +83,7 @@ async function addOrUpdateUserInfo(userInfo) {
         redirectCheck = false;
 
     } catch (error) {
-        logger.error("Error adding/updating user info " + error);
+        logger.error(`Error adding/updating user info ${error}`);
         
         //if this process fails, redirect user to error page
         redirectCheck = true;
@@ -77,6 +92,50 @@ async function addOrUpdateUserInfo(userInfo) {
     finally {
         await client.close();
         return { requiresConfirmation, redirectCheck };
+    }
+}
+
+async function addOrUpdatePreferredEmail(userId, userPreferredEmail) {
+    const filterUserInfo = { "userId": userId };
+    const updateUserInfo = {
+        $set: {
+            userPreferredEmail: userPreferredEmail,
+        }
+    }
+    const updateOptions = { upsert: true };
+
+    try {
+        await client.connect();
+        const result = await collection.updateOne(filterUserInfo, updateUserInfo, updateOptions);
+    } catch (error) {
+        logger.error(`Error adding/updating user's preferred email ${error}`);
+    } finally {
+        await client.close();
+        return;
+    }
+}
+
+async function deleteUser(userId) {
+    if (userId) {
+        const filterUser = { "userId": userId }
+        
+        try {
+            await client.connect();
+            const result = await collection.deleteOne(filterUser);
+
+            if (result) {
+                const deletedCount = result.deletedCount;
+                return deletedCount;
+            } else {
+                logger.info("No user found using that id, no data deleted.")
+            } 
+        } catch (error) {
+            logger.error(`Error deleting user, userId submitted: ${userId}`);
+        } finally {
+            await client.close();
+        }
+    } else {
+        logger.info(`No user deleted. userId =  ${userId}`);
     }
 }
 
@@ -95,7 +154,7 @@ async function checkForRefreshToken(refreshTokenCookie) {
                 logger.info("No document found using the submitted refresh token.")
             }
         } catch (error) {
-            logger.error("Error checking for refresh token:" + error)
+            logger.error(`Error checking for refresh token: ${error}`)
         } finally {
             await client.close();
         }
@@ -104,9 +163,14 @@ async function checkForRefreshToken(refreshTokenCookie) {
     }
 }
 
-exports.client = client;
-exports.collection = collection;
-exports.addOrUpdateUserInfo = addOrUpdateUserInfo;
-exports.getUsers = getUsers;
-exports.checkForRefreshToken = checkForRefreshToken;
-
+module.exports = {
+    client,
+    db,
+    collection,
+    addOrUpdateUserInfo,
+    addOrUpdatePreferredEmail,
+    getUsers,
+    getUserInfo,
+    deleteUser,
+    checkForRefreshToken,
+}
